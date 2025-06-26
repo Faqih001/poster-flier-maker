@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/genai";
+import { GenerativeAI } from "@google/genai";
 
 // Use the environment variable for API key without hardcoded fallback
 const API_KEY = process.env.GEMINI_API_KEY;
@@ -9,7 +9,7 @@ if (!API_KEY) {
 }
 
 // Initialize the Gemini API
-export const genAI = new GoogleGenerativeAI(API_KEY as string);
+export const genAI = new GenerativeAI(API_KEY as string);
 
 // Generate text using Gemini
 export async function generateText(prompt: string): Promise<string> {
