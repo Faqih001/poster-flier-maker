@@ -3,9 +3,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { Stage, Layer, Rect, Text as KonvaText } from 'react-konva';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Slider } from '@/components/ui/slider';
-import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
+import { Slider } from './slider';
+import { Textarea } from './textarea';
 import { 
   Bold, Italic, AlignLeft, AlignCenter, AlignRight, 
   Image, Type, Layers, Download, Undo, Redo,
