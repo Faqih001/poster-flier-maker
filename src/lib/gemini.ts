@@ -1,9 +1,15 @@
 import { GoogleGenerativeAI } from "@google/genai";
 
-const API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDEFsF9visXbuZfNEvtPvC8wI_deQBH-ro';
+// Use the environment variable for API key without hardcoded fallback
+const API_KEY = process.env.GEMINI_API_KEY;
+
+// Make sure API key exists
+if (!API_KEY) {
+  console.error('GEMINI_API_KEY is not defined in environment variables');
+}
 
 // Initialize the Gemini API
-export const genAI = new GoogleGenerativeAI(API_KEY);
+export const genAI = new GoogleGenerativeAI(API_KEY as string);
 
 // Generate text using Gemini
 export async function generateText(prompt: string): Promise<string> {
