@@ -1,16 +1,17 @@
-import { GoogleGenAI, Modality } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/genai";
 
 const API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDEFsF9visXbuZfNEvtPvC8wI_deQBH-ro';
 
 // Initialize the Gemini API
-export const genAI = new GoogleGenAI({ apiKey: API_KEY });
+export const genAI = new GoogleGenerativeAI(API_KEY);
 
 // Generate text using Gemini
 export async function generateText(prompt: string): Promise<string> {
   try {
-    // For text generation, we'll use a text model
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-
+    // For text generation, we'll use the gemini-pro model
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    
+    // Generate content
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
@@ -26,21 +27,20 @@ export async function generateText(prompt: string): Promise<string> {
 export async function generateImage(prompt: string): Promise<string> {
   try {
     // Use image generation model
-    const response = await genAI.models.generateContent({
-      model: "gemini-2.0-flash-preview-image-generation",
-      contents: prompt,
-      config: {
-        responseModalities: [Modality.TEXT, Modality.IMAGE],
-      },
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-preview-image-generation" });
+    
+    // Generate content
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
 
     // Extract the image data
-    if (response.candidates && response.candidates[0] && response.candidates[0].content && response.candidates[0].content.parts) {
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData && part.inlineData.data) {
-          return part.inlineData.data;
-        }
-      }
+    const parts = response.candidates?.[0]?.content?.parts || [];
+    // Define the type for the part to avoid 'any' error
+    const imagePart = parts.find((part: { inlineData?: { mimeType?: string, data?: string } }) => 
+      part.inlineData && part.inlineData.mimeType?.includes('image'));
+    
+    if (imagePart?.inlineData?.data) {
+      return imagePart.inlineData.data;
     }
     
     throw new Error('No image data in response');

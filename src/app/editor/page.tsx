@@ -363,7 +363,7 @@ export default function EditorPage({ searchParams }: { searchParams: SearchParam
                           min={8} 
                           max={72} 
                           step={1} 
-                          onValueChange={(value) => updateTextProperty(selectedId, 'fontSize', value[0])} 
+                          onValueChange={(value: number[]) => updateTextProperty(selectedId, 'fontSize', value[0])} 
                         />
                       </div>
                     </div>
