@@ -1,0 +1,506 @@
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { Stage, Layer, Rect, Text as KonvaText, Image as KonvaImage } from 'react-konva';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Slider } from '@/components/ui/slider';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  Bold, Italic, AlignLeft, AlignCenter, AlignRight, 
+  Image, Type, Layers, Download, Undo, Redo,
+  Plus, Minus, Save
+} from 'lucide-react';
+
+// Demo templates - In a real app, these would come from the database
+const templates = [
+  {
+    id: 1,
+    name: "Business Promotion",
+    width: 800,
+    height: 1200,
+    background: "#ffffff",
+    elements: []
+  },
+  // More templates would be defined here
+];
+
+export default function EditorPage({ searchParams }) {
+  const templateId = searchParams?.template || 1;
+  const template = templates.find(t => t.id === Number(templateId)) || templates[0];
+  
+  const stageRef = useRef(null);
+  const [selectedId, setSelectedId] = useState(null);
+  const [elements, setElements] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [historyStep, setHistoryStep] = useState(0);
+  const [zoom, setZoom] = useState(1);
+  
+  // Initialize with template
+  useEffect(() => {
+    // In a real app, we would fetch the template data
+    setElements([
+      {
+        id: 'background',
+        type: 'rect',
+        x: 0,
+        y: 0,
+        width: template.width,
+        height: template.height,
+        fill: template.background,
+      },
+      {
+        id: 'title',
+        type: 'text',
+        x: 100,
+        y: 100,
+        text: 'Your Business Name',
+        fontSize: 36,
+        fontStyle: 'bold',
+        fill: '#333',
+        width: 600,
+        align: 'center',
+      },
+      {
+        id: 'subtitle',
+        type: 'text',
+        x: 150,
+        y: 200,
+        text: 'Promotional Offer or Event Details',
+        fontSize: 24,
+        fontStyle: 'normal',
+        fill: '#555',
+        width: 500,
+        align: 'center',
+      }
+    ]);
+    
+    // Add initial state to history
+    updateHistory([
+      {
+        id: 'background',
+        type: 'rect',
+        x: 0,
+        y: 0,
+        width: template.width,
+        height: template.height,
+        fill: template.background,
+      },
+      {
+        id: 'title',
+        type: 'text',
+        x: 100,
+        y: 100,
+        text: 'Your Business Name',
+        fontSize: 36,
+        fontStyle: 'bold',
+        fill: '#333',
+        width: 600,
+        align: 'center',
+      },
+      {
+        id: 'subtitle',
+        type: 'text',
+        x: 150,
+        y: 200,
+        text: 'Promotional Offer or Event Details',
+        fontSize: 24,
+        fontStyle: 'normal',
+        fill: '#555',
+        width: 500,
+        align: 'center',
+      }
+    ]);
+  }, [template]);
+
+  // Track history for undo/redo
+  const updateHistory = (newElements) => {
+    const newHistory = [...history.slice(0, historyStep + 1), newElements];
+    setHistory(newHistory);
+    setHistoryStep(newHistory.length - 1);
+  };
+
+  // Add new text element
+  const addText = () => {
+    const newTextElement = {
+      id: `text-${Date.now()}`,
+      type: 'text',
+      x: 150,
+      y: 300,
+      text: 'Click to edit text',
+      fontSize: 20,
+      fontStyle: 'normal',
+      fill: '#333',
+      width: 500,
+      align: 'left',
+      draggable: true,
+    };
+    
+    const newElements = [...elements, newTextElement];
+    setElements(newElements);
+    updateHistory(newElements);
+    setSelectedId(newTextElement.id);
+  };
+
+  // Update text properties
+  const updateTextProperty = (id, property, value) => {
+    const newElements = elements.map(el => {
+      if (el.id === id && el.type === 'text') {
+        return { ...el, [property]: value };
+      }
+      return el;
+    });
+    
+    setElements(newElements);
+    updateHistory(newElements);
+  };
+
+  // Handle element selection
+  const handleSelect = (id) => {
+    setSelectedId(id);
+  };
+
+  // Handle element drag
+  const handleDragEnd = (e, id) => {
+    const newElements = elements.map(el => {
+      if (el.id === id) {
+        return {
+          ...el,
+          x: e.target.x(),
+          y: e.target.y(),
+        };
+      }
+      return el;
+    });
+    
+    setElements(newElements);
+    updateHistory(newElements);
+  };
+
+  // Generate AI content (would connect to Gemini API)
+  const generateAIContent = async (prompt) => {
+    try {
+      // This would call our API endpoint
+      const response = await fetch('/api/gemini/generate-text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
+      });
+      
+      if (!response.ok) throw new Error('Failed to generate content');
+      
+      const data = await response.json();
+      
+      if (selectedId && elements.find(el => el.id === selectedId)?.type === 'text') {
+        updateTextProperty(selectedId, 'text', data.text);
+      }
+    } catch (error) {
+      console.error('Error generating AI content:', error);
+      // Show error notification
+    }
+  };
+
+  // Handle undo/redo
+  const handleUndo = () => {
+    if (historyStep > 0) {
+      setHistoryStep(historyStep - 1);
+      setElements(history[historyStep - 1]);
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyStep < history.length - 1) {
+      setHistoryStep(historyStep + 1);
+      setElements(history[historyStep + 1]);
+    }
+  };
+
+  // Export design as image
+  const handleExport = () => {
+    if (stageRef.current) {
+      const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
+      const link = document.createElement('a');
+      link.download = 'poster-design.png';
+      link.href = dataURL;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  // Find the currently selected element
+  const selectedElement = elements.find(el => el.id === selectedId);
+
+  return (
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
+      {/* Left Sidebar - Tools */}
+      <div className="w-16 bg-white border-r flex flex-col items-center py-4 space-y-6">
+        <Button variant="ghost" size="icon" onClick={addText}>
+          <Type className="h-5 w-5" />
+        </Button>
+        <Button variant="ghost" size="icon">
+          <Image className="h-5 w-5" />
+        </Button>
+        <Button variant="ghost" size="icon">
+          <Layers className="h-5 w-5" />
+        </Button>
+        <div className="border-t border-gray-200 w-8 my-2"></div>
+        <Button variant="ghost" size="icon" onClick={handleUndo} disabled={historyStep === 0}>
+          <Undo className="h-5 w-5" />
+        </Button>
+        <Button variant="ghost" size="icon" onClick={handleRedo} disabled={historyStep === history.length - 1}>
+          <Redo className="h-5 w-5" />
+        </Button>
+        <div className="border-t border-gray-200 w-8 my-2"></div>
+        <Button variant="ghost" size="icon" onClick={() => setZoom(Math.min(zoom + 0.1, 2))}>
+          <Plus className="h-5 w-5" />
+        </Button>
+        <div className="text-sm font-medium">{Math.round(zoom * 100)}%</div>
+        <Button variant="ghost" size="icon" onClick={() => setZoom(Math.max(zoom - 0.1, 0.5))}>
+          <Minus className="h-5 w-5" />
+        </Button>
+      </div>
+
+      {/* Main Editor Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Toolbar */}
+        <div className="bg-white border-b p-4 flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <h1 className="text-xl font-bold">PosterPro Editor</h1>
+            <span className="text-gray-500">|</span>
+            <span className="text-gray-600">{template.name}</span>
+          </div>
+          <div className="flex space-x-2">
+            <Button variant="outline" size="sm">
+              <Save className="h-4 w-4 mr-2" />
+              Save
+            </Button>
+            <Button variant="primary" size="sm" onClick={handleExport}>
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </div>
+        </div>
+
+        {/* Canvas Area */}
+        <div className="flex-1 overflow-auto bg-gray-200 flex items-center justify-center">
+          <div 
+            className="bg-white shadow-lg"
+            style={{ 
+              transform: `scale(${zoom})`,
+              transition: 'transform 0.2s'
+            }}
+          >
+            <Stage 
+              width={template.width} 
+              height={template.height}
+              ref={stageRef}
+              onClick={(e) => {
+                if (e.target === e.target.getStage()) {
+                  setSelectedId(null);
+                }
+              }}
+            >
+              <Layer>
+                {elements.map((element) => {
+                  if (element.type === 'rect') {
+                    return (
+                      <Rect
+                        key={element.id}
+                        id={element.id}
+                        x={element.x}
+                        y={element.y}
+                        width={element.width}
+                        height={element.height}
+                        fill={element.fill}
+                        onClick={() => handleSelect(element.id)}
+                        draggable={element.draggable}
+                        onDragEnd={(e) => handleDragEnd(e, element.id)}
+                      />
+                    );
+                  } else if (element.type === 'text') {
+                    return (
+                      <KonvaText
+                        key={element.id}
+                        id={element.id}
+                        x={element.x}
+                        y={element.y}
+                        text={element.text}
+                        fontSize={element.fontSize}
+                        fontStyle={element.fontStyle}
+                        fill={element.fill}
+                        width={element.width}
+                        align={element.align}
+                        onClick={() => handleSelect(element.id)}
+                        onTap={() => handleSelect(element.id)}
+                        draggable={true}
+                        onDragEnd={(e) => handleDragEnd(e, element.id)}
+                        stroke={selectedId === element.id ? '#0066FF' : undefined}
+                        strokeWidth={selectedId === element.id ? 1 : undefined}
+                      />
+                    );
+                  }
+                  return null;
+                })}
+              </Layer>
+            </Stage>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Sidebar - Properties Panel */}
+      <div className="w-72 bg-white border-l overflow-y-auto p-4">
+        {selectedElement ? (
+          <div>
+            <h3 className="font-bold mb-4">Element Properties</h3>
+            
+            {selectedElement.type === 'text' && (
+              <Tabs defaultValue="content">
+                <TabsList className="w-full mb-4">
+                  <TabsTrigger value="content" className="flex-1">Content</TabsTrigger>
+                  <TabsTrigger value="style" className="flex-1">Style</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="content">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Text Content</label>
+                      <Textarea 
+                        value={selectedElement.text}
+                        onChange={(e) => updateTextProperty(selectedElement.id, 'text', e.target.value)}
+                        rows={4}
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Generate with AI</label>
+                      <div className="space-y-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full justify-start"
+                          onClick={() => generateAIContent('Generate a catchy business promotion heading')}
+                        >
+                          Business Headline
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full justify-start"
+                          onClick={() => generateAIContent('Generate a short promotional paragraph for a business')}
+                        >
+                          Promotional Text
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full justify-start"
+                          onClick={() => generateAIContent('Generate a call to action text')}
+                        >
+                          Call to Action
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="style">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Font Size: {selectedElement.fontSize}px</label>
+                      <Slider 
+                        min={8} 
+                        max={72} 
+                        step={1}
+                        value={[selectedElement.fontSize]}
+                        onValueChange={(value) => updateTextProperty(selectedElement.id, 'fontSize', value[0])}
+                        className="w-full"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Text Style</label>
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant={selectedElement.fontStyle.includes('bold') ? 'default' : 'outline'} 
+                          size="sm"
+                          onClick={() => {
+                            const newStyle = selectedElement.fontStyle.includes('bold') 
+                              ? selectedElement.fontStyle.replace('bold', '').trim() 
+                              : `${selectedElement.fontStyle} bold`.trim();
+                            updateTextProperty(selectedElement.id, 'fontStyle', newStyle);
+                          }}
+                        >
+                          <Bold className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant={selectedElement.fontStyle.includes('italic') ? 'default' : 'outline'} 
+                          size="sm"
+                          onClick={() => {
+                            const newStyle = selectedElement.fontStyle.includes('italic') 
+                              ? selectedElement.fontStyle.replace('italic', '').trim() 
+                              : `${selectedElement.fontStyle} italic`.trim();
+                            updateTextProperty(selectedElement.id, 'fontStyle', newStyle);
+                          }}
+                        >
+                          <Italic className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Text Alignment</label>
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant={selectedElement.align === 'left' ? 'default' : 'outline'} 
+                          size="sm"
+                          onClick={() => updateTextProperty(selectedElement.id, 'align', 'left')}
+                        >
+                          <AlignLeft className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant={selectedElement.align === 'center' ? 'default' : 'outline'} 
+                          size="sm"
+                          onClick={() => updateTextProperty(selectedElement.id, 'align', 'center')}
+                        >
+                          <AlignCenter className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant={selectedElement.align === 'right' ? 'default' : 'outline'} 
+                          size="sm"
+                          onClick={() => updateTextProperty(selectedElement.id, 'align', 'right')}
+                        >
+                          <AlignRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Color</label>
+                      <div className="grid grid-cols-6 gap-2">
+                        {['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFFFFF', '#333333', '#666666', '#999999', '#CCCCCC'].map((color) => (
+                          <div 
+                            key={color}
+                            className={`w-6 h-6 rounded-full cursor-pointer border ${selectedElement.fill === color ? 'border-primary border-2' : 'border-gray-200'}`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => updateTextProperty(selectedElement.id, 'fill', color)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            )}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            <p>Select an element to edit its properties</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
