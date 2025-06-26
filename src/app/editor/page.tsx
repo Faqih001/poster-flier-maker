@@ -11,7 +11,58 @@ import {
   Image, Type, Layers, Download, Undo, Redo,
   Plus, Minus, Save
 } from 'lucide-react';
-import { EditorElement, Template, TextElement, RectElement } from '@/lib/types';
+
+// Define types
+interface TextElement {
+  id: string;
+  type: 'text';
+  x: number;
+  y: number;
+  text: string;
+  fontSize: number;
+  fontStyle: string;
+  fill: string;
+  width: number;
+  align: string;
+  draggable?: boolean;
+}
+
+interface RectElement {
+  id: string;
+  type: 'rect';
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: string;
+  draggable?: boolean;
+}
+
+interface ImageElement {
+  id: string;
+  type: 'image';
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  src: string;
+  draggable?: boolean;
+}
+
+type EditorElement = TextElement | RectElement | ImageElement;
+
+interface Template {
+  id: number;
+  name: string;
+  width: number;
+  height: number;
+  background: string;
+  elements: EditorElement[];
+}
+
+interface SearchParams {
+  template?: string;
+}
 
 // Demo templates - In a real app, these would come from the database
 const templates: Template[] = [
@@ -25,10 +76,6 @@ const templates: Template[] = [
   },
   // More templates would be defined here
 ];
-
-interface SearchParams {
-  template?: string;
-}
 
 export default function EditorPage({ searchParams }: { searchParams: SearchParams }) {
   const templateId = searchParams?.template || "1";
@@ -60,7 +107,7 @@ export default function EditorPage({ searchParams }: { searchParams: SearchParam
         width: template.width,
         height: template.height,
         fill: template.background,
-      } as RectElement,
+      },
       {
         id: 'title',
         type: 'text',
@@ -72,7 +119,7 @@ export default function EditorPage({ searchParams }: { searchParams: SearchParam
         fill: '#333',
         width: 600,
         align: 'center',
-      } as TextElement,
+      },
       {
         id: 'subtitle',
         type: 'text',
@@ -84,7 +131,7 @@ export default function EditorPage({ searchParams }: { searchParams: SearchParam
         fill: '#555',
         width: 500,
         align: 'center',
-      } as TextElement
+      }
     ];
     
     setElements(initialElements);
@@ -116,7 +163,7 @@ export default function EditorPage({ searchParams }: { searchParams: SearchParam
   };
 
   // Update text properties
-  const updateTextProperty = (id: string, property: string, value: any) => {
+  const updateTextProperty = (id: string, property: string, value: string | number) => {
     const newElements = elements.map(el => {
       if (el.id === id && el.type === 'text') {
         return { ...el, [property]: value };
@@ -139,7 +186,7 @@ export default function EditorPage({ searchParams }: { searchParams: SearchParam
   };
 
   // Handle element position changes
-  const handleElementDrag = (e: any, id: string) => {
+  const handleElementDrag = (e: { target: { x: () => number; y: () => number } }, id: string) => {
     const element = elements.find(el => el.id === id);
     if (!element) return;
     
@@ -300,7 +347,7 @@ export default function EditorPage({ searchParams }: { searchParams: SearchParam
                   {/* Text content editor */}
                   <Textarea 
                     value={(elements.find(el => el.id === selectedId) as TextElement)?.text || ''} 
-                    onChange={(e) => updateTextProperty(selectedId, 'text', e.target.value)} 
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateTextProperty(selectedId, 'text', e.target.value)} 
                     placeholder="Enter text..." 
                     className="w-full"
                   />

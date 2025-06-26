@@ -417,6 +417,25 @@ export default function EditorPage({ searchParams }: { searchParams: SearchParam
                       </Button>
                     </div>
                   </div>
+                  
+                  {/* AI Text Generation */}
+                  <div className="border-t pt-4 mt-4">
+                    <h3 className="text-sm font-medium mb-2">AI Text Generation</h3>
+                    <Textarea 
+                      placeholder="Describe what text you need..." 
+                      className="w-full mb-2"
+                      id="ai-prompt"
+                    />
+                    <Button 
+                      onClick={() => {
+                        const prompt = (document.getElementById('ai-prompt') as HTMLTextAreaElement)?.value;
+                        if (prompt) generateAIText(prompt);
+                      }}
+                      className="w-full"
+                    >
+                      Generate Text
+                    </Button>
+                  </div>
                 </div>
               )}
             </TabsContent>
