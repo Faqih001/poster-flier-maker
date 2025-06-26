@@ -3,6 +3,14 @@ import { generateText } from '@/lib/gemini';
 
 export async function POST(request: NextRequest) {
   try {
+    // Check for API key first
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json(
+        { error: 'GEMINI_API_KEY not configured in environment variables' }, 
+        { status: 500 }
+      );
+    }
+    
     const { prompt } = await request.json();
     
     if (!prompt) {

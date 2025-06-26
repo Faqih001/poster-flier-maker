@@ -328,6 +328,30 @@ export default function EditorPage({ searchParams }: { searchParams: SearchParam
                 <Type className="w-4 h-4 mr-2" />
                 Add Text
               </Button>
+              
+              {/* AI Text Generation */}
+              <div className="mt-4 border-t pt-4">
+                <h3 className="text-sm font-medium mb-2">Generate AI Text</h3>
+                <div className="space-y-2">
+                  <Textarea 
+                    placeholder="Enter prompt for AI text generation..." 
+                    className="w-full"
+                    id="ai-prompt"
+                  />
+                  <Button 
+                    onClick={() => {
+                      const prompt = (document.getElementById('ai-prompt') as HTMLTextAreaElement).value;
+                      if (prompt) {
+                        generateAIText(prompt);
+                      }
+                    }} 
+                    className="w-full"
+                  >
+                    Generate Text
+                  </Button>
+                </div>
+              </div>
+              
               <div className="space-y-2">
                 <Button onClick={undo} disabled={historyStep <= 0} className="w-1/2" variant="outline">
                   <Undo className="w-4 h-4 mr-2" />
