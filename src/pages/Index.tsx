@@ -145,7 +145,7 @@ const Index = () => {
                   color: "from-purple-500 to-pink-500",
                   bgColor: "bg-purple-100",
                   delay: "0ms",
-                  image: "https://images.unsplash.com/photo-1611532736576-acf8ec38926b?q=80&w=800&auto=format&fit=crop"
+                  image: "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?q=80&w=800&auto=format&fit=crop"
                 },
                 {
                   icon: Wand2,
@@ -154,7 +154,7 @@ const Index = () => {
                   color: "from-blue-500 to-cyan-500",
                   bgColor: "bg-blue-100",
                   delay: "200ms",
-                  image: "https://images.unsplash.com/photo-1677442135306-8a5fa0204b07?q=80&w=800&auto=format&fit=crop"
+                  image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=800&auto=format&fit=crop"
                 },
                 {
                   icon: Smartphone,
@@ -163,7 +163,7 @@ const Index = () => {
                   color: "from-green-500 to-emerald-500",
                   bgColor: "bg-green-100",
                   delay: "400ms",
-                  image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?q=80&w=800&auto=format&fit=crop"
+                  image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=800&auto=format&fit=crop"
                 },
                 {
                   icon: Download,
@@ -172,7 +172,7 @@ const Index = () => {
                   color: "from-orange-500 to-red-500",
                   bgColor: "bg-orange-100",
                   delay: "600ms",
-                  image: "https://images.unsplash.com/photo-1559297434-fae8a1916a79?q=80&w=800&auto=format&fit=crop"
+                  image: "https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?q=80&w=800&auto=format&fit=crop"
                 }
               ].map((feature, index) => (
                 <Card 
