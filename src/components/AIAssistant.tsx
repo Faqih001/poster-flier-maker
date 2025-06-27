@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ModelClient from "@azure-rest/ai-inference";
 import { AzureKeyCredential } from "@azure/core-auth";
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -97,7 +99,7 @@ export const AIAssistant = (): JSX.Element => {
           // Prepare the messages for the Azure AI API
           const systemMessage = {
             role: "system",
-            content: "You are a helpful AI assistant for FlierHustle, a poster and flier creation platform for small businesses and entrepreneurs in Africa. Keep responses under 200 words and always be encouraging about their business success."
+            content: "You are a helpful AI assistant for FlierHustle, a poster and flier creation platform for small businesses and entrepreneurs in Africa. Keep responses under 200 words and always be encouraging about their business success. Format your responses using Markdown with proper headings, bold text, italics, bullet points, and numbered lists when appropriate to make the information clear and structured."
           };
           
           // Convert our messages to the format expected by Azure AI
@@ -253,15 +255,23 @@ Would you like me to help you with anything else about poster creation?`;
                       )}
                     </div>
                     
-                    {/* Message bubble - improved responsive sizing */}
+                    {/* Message bubble - improved responsive sizing with markdown support */}
                     <div
                       className={`max-w-[76%] sm:max-w-[75%] p-2.5 sm:p-3 rounded-2xl ${
                         message.role === 'user'
                           ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
                           : 'bg-gray-100 text-gray-900'
-                      }`}
+                      } ${message.role === 'assistant' ? 'prose-sm prose-headings:text-gray-900 prose-headings:font-bold prose-p:text-gray-800 prose-a:text-blue-600 prose-strong:text-gray-900 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-code:bg-gray-200 prose-code:p-0.5 prose-code:rounded' : ''}`}
                     >
-                      <p className="text-xs sm:text-sm break-words">{message.content}</p>
+                      {message.role === 'assistant' ? (
+                        <div className="text-xs sm:text-sm break-words">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]} className="prose-sm">
+                            {message.content}
+                          </ReactMarkdown>
+                        </div>
+                      ) : (
+                        <p className="text-xs sm:text-sm break-words">{message.content}</p>
+                      )}
                       <p className="text-[8px] sm:text-[10px] opacity-70 mt-1 text-right">
                         {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
