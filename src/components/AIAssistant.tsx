@@ -4,26 +4,27 @@ import { Bot, X, Send, Loader2, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { GoogleGenAI, Modality } from '@google/genai';
+import ModelClient from "@azure-rest/ai-inference";
 
 interface Message {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: Date;
 }
 
-// Initialize the Google GenAI and Supabase URL from .env file
+// Initialize the Azure AI and Supabase URL from .env file
 // Accessing environment variables with Vite's import.meta.env
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const AZURE_API_KEY = import.meta.env.VITE_AZURE_API_KEY || "3uTQWVskUTQFsIJbZVt2PfQFlha9afMlLhTmzgXbYY6BNq79PU69JQQJ99BEACYeBjFXJ3w3AAAAACOGMM1w";
+const AZURE_ENDPOINT = import.meta.env.VITE_AZURE_ENDPOINT || "https://mybots254.services.ai.azure.com/models";
+const AZURE_DEPLOYMENT = import.meta.env.VITE_AZURE_DEPLOYMENT || "grok-3";
 const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL;
-const GEMINI_TEXT_MODEL = import.meta.env.VITE_GEMINI_TEXT_MODEL || "gemini-2.5-pro";
-const GEMINI_IMAGE_MODEL = import.meta.env.VITE_GEMINI_IMAGE_MODEL || "gemini-2.0-flash-preview-image-generation";
 
 // For development, log if environment variables are missing
-if (import.meta.env.DEV && (!API_KEY || !SUPABASE_FUNCTION_URL)) {
+if (import.meta.env.DEV && (!AZURE_API_KEY || !SUPABASE_FUNCTION_URL)) {
   console.warn(
     "Missing environment variables. Make sure you've set up your .env file correctly:\n" +
-    "- VITE_GEMINI_API_KEY: " + (API_KEY ? "✓" : "✗") + "\n" +
+    "- VITE_AZURE_API_KEY: " + (AZURE_API_KEY ? "✓" : "✗") + "\n" +
+    "- VITE_AZURE_ENDPOINT: " + (AZURE_ENDPOINT ? "✓" : "✗") + "\n" +
     "- VITE_SUPABASE_FUNCTION_URL: " + (SUPABASE_FUNCTION_URL ? "✓" : "✗")
   );
 }
@@ -33,7 +34,7 @@ export const AIAssistant = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Hi! I\'m your FlierHustle AI assistant. How can I help you create amazing posters today?',
+      content: 'Hi! I\'m your FlierHustle AI assistant powered by Azure Grok. How can I help you create amazing posters today?',
       timestamp: new Date()
     }
   ]);
@@ -102,95 +103,100 @@ export const AIAssistant = () => {
         // Continue to fallback implementation
       }
       
-      // Fallback to client-side Gemini if API key is available
-      if (API_KEY) {
-        // Initialize the Google GenAI
-        const genAI = new GoogleGenAI({
-          apiKey: API_KEY,
-        });
-        
-        if (isImageRequest) {
-          // Handle image generation request
-          try {
-            const response = await genAI.models.generateContent({
-              model: GEMINI_IMAGE_MODEL,
-              contents: inputMessage,
-              config: {
-                responseModalities: [Modality.TEXT, Modality.IMAGE],
-              },
-            });
-            
-            let responseContent = "I've created this image based on your request:";
-            
-            // Check if we have image data in the response
-            if (response.candidates && 
-                response.candidates[0] && 
-                response.candidates[0].content && 
-                response.candidates[0].content.parts) {
-              
-              for (const part of response.candidates[0].content.parts) {
-                if (part.text) {
-                  responseContent += "\n\n" + part.text;
-                } else if (part.inlineData) {
-                  // Here we'd handle the image in a real implementation
-                  // For client-side, we'd display it directly rather than saving to disk
-                  const imageData = part.inlineData.data;
-                  responseContent += "\n\n[Image generated successfully! You can download it from your dashboard.]";
-                  
-                  // In a complete implementation, we would:
-                  // 1. Upload this image to storage
-                  // 2. Provide a download link
-                  // 3. Or display it directly in the chat
-                }
-              }
-            } else {
-              responseContent = "I tried to create an image, but encountered an issue. Could you try a different description?";
-            }
-            
-            const assistantMessage: Message = {
-              role: 'assistant',
-              content: responseContent,
-              timestamp: new Date()
-            };
-            
-            setMessages(prev => [...prev, assistantMessage]);
-          } catch (imageError) {
-            console.error('Image generation error:', imageError);
-            throw new Error('Could not generate image');
-          }
-        } else {
-          // Handle text-based chat using the text model
-          const model = genAI.models;
-          
-          // Add system prompt context + conversation history
-          const systemPrompt = 'You are a helpful AI assistant for FlierHustle, a poster and flier creation platform for small businesses and entrepreneurs in Africa. Keep responses under 200 words and always be encouraging about their business success.';
-          
-          // Create conversation content with previous messages
-          const conversationContext = messages
-            .filter(msg => messages.indexOf(msg) > 0) // Skip the initial greeting
-            .map(msg => msg.content)
-            .join("\n\n");
-            
-          const fullPrompt = `${systemPrompt}\n\n${conversationContext}\n\n${inputMessage}`;
-            
-          // Send the request with the newer API
-          const response = await model.generateContent({
-            model: GEMINI_TEXT_MODEL,
-            contents: fullPrompt,
-            config: {
-              temperature: 0.7,
-              maxOutputTokens: 1024,
-            },
+      // Fallback to client-side Azure AI if API key is available
+      if (AZURE_API_KEY) {
+        try {
+          // Create Azure AI client with API key authentication
+          const client = new ModelClient(AZURE_ENDPOINT, { 
+            key: AZURE_API_KEY 
           });
           
-          // Extract the text response
+          // Prepare the messages for the Azure AI API
+          const systemMessage = {
+            role: "system",
+            content: "You are a helpful AI assistant for FlierHustle, a poster and flier creation platform for small businesses and entrepreneurs in Africa. Keep responses under 200 words and always be encouraging about their business success."
+          };
+          
+          // Convert our messages to the format expected by Azure AI
+          const apiMessages = [
+            systemMessage,
+            ...messages.filter(msg => messages.indexOf(msg) > 0).map(msg => ({
+              role: msg.role,
+              content: msg.content
+            })),
+            {
+              role: "user",
+              content: inputMessage
+            }
+          ];
+          
+          let responseContent = '';
+          
+          if (isImageRequest) {
+            // For image requests, we need to use a different approach
+            // Azure Grok-3 doesn't directly support image generation,
+            // so we'll use it to generate a description for a potential image
+            
+            // Add a special instruction for image generation requests
+            apiMessages.push({
+              role: "system",
+              content: "The user is requesting an image generation. Since I can't generate images directly, I'll provide a detailed description that could be used with image generation tools."
+            });
+            
+            // Call the chat completions API
+            const response = await client.path("/chat/completions").post({
+              body: {
+                messages: apiMessages,
+                max_tokens: 1000,
+                temperature: 0.7,
+                model: AZURE_DEPLOYMENT,
+              }
+            });
+            
+            if (response.status === "200") {
+              responseContent = `I understand you'd like an image of ${inputMessage.replace(/create image of |generate image of |make an image of /i, '')}.
+
+While I can't generate images directly, here's what I'd recommend for your poster:
+
+1. Try using our poster editor feature on the dashboard
+2. In the image prompt field, use this description: "${inputMessage}"
+3. Click the "Generate AI Image" button
+
+Would you like me to help you with anything else about poster creation?`;
+            } else {
+              throw new Error("Failed to get response from Azure AI");
+            }
+          } else {
+            // Regular text-based conversation
+            // Call the chat completions API
+            const response = await client.path("/chat/completions").post({
+              body: {
+                messages: apiMessages,
+                max_tokens: 1000,
+                temperature: 0.7,
+                model: AZURE_DEPLOYMENT,
+              }
+            });
+            
+            if (response.status === "200") {
+              // Extract content from response
+              responseContent = response.body.choices[0].message.content;
+            } else {
+              throw new Error("Failed to get response from Azure AI");
+            }
+          }
+          
+          // Create the assistant message with the response
           const assistantMessage: Message = {
             role: 'assistant',
-            content: response.text || "I'm sorry, I couldn't generate a response at this time.",
+            content: responseContent || "I'm sorry, I couldn't generate a response at this time.",
             timestamp: new Date()
           };
           
           setMessages(prev => [...prev, assistantMessage]);
+        } catch (azureError) {
+          console.error('Azure AI error:', azureError);
+          throw new Error('Could not generate response with Azure AI');
         }
       } else {
         throw new Error('AI service not available');
