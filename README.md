@@ -60,6 +60,27 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Environment Variables Setup
+
+This project uses environment variables to manage API keys and sensitive information. Follow these steps to set up your environment:
+
+1. Create a `.env` file in the root directory (it's already included in `.gitignore` to prevent committing sensitive data)
+2. Copy the variables from `.env.example` and replace with your actual API keys:
+
+```
+# For AI Assistant functionality (Google Gemini API)
+GEMINI_API_KEY=your_actual_gemini_api_key
+
+# For email sending functionality (Resend API)
+RESEND_API_KEY=your_actual_resend_api_key
+```
+
+### Important Security Notes:
+- Never commit your actual API keys to version control
+- Do not share `.env` files containing real API keys
+- For production, set environment variables through your hosting platform's secure environment configuration
+- Consider rotating API keys periodically for enhanced security
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/419f2799-3fcc-4c19-bbc8-60f13b08a400) and click on Share -> Publish.
