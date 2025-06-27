@@ -156,6 +156,32 @@ const Pricing = () => {
 												? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg'
 												: 'bg-gray-800 hover:bg-gray-900'
 										} text-white text-lg py-6 font-medium transition-all duration-300`}
+										onClick={async () => {
+											// Only allow purchase for Basic or Unlimited
+											if (plan.name === 'Print & Delivery') {
+												window.location.href = '/order-prints';
+												return;
+											}
+											const email = prompt(
+												'Enter your email to continue with payment:'
+											);
+											if (!email) return;
+											const res = await fetch('/api/initiate-intasend-payment', {
+												method: 'POST',
+												headers: { 'Content-Type': 'application/json' },
+												body: JSON.stringify({
+													amount: plan.name === 'Basic' ? 50 : 399,
+													email,
+													plan: plan.name,
+												}),
+											});
+											const data = await res.json();
+											if (data && data.url) {
+												window.location.href = data.url;
+											} else {
+												alert(data.error || 'Failed to initiate payment.');
+											}
+										}}
 									>
 										{plan.cta}
 									</Button>
@@ -181,6 +207,41 @@ const Pricing = () => {
 						</Button>
 					</div>
 				</div>
+			</div>
+			{/* Payment Methods */}
+			<div className="text-center mt-16">
+				<h3 className="text-2xl font-bold mb-6">Accepted Payment Methods</h3>
+				<div className="flex flex-wrap justify-center items-center gap-8 text-gray-600">
+					<div className="text-center">
+						<div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+							<span className="text-3xl">📱</span>
+						</div>
+						<p className="font-medium">M-Pesa</p>
+					</div>
+					<div className="text-center">
+						<div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+							<span className="text-3xl">💳</span>
+						</div>
+						<p className="font-medium">Card</p>
+					</div>
+					<div className="text-center">
+						<div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+							<span className="text-3xl">🏦</span>
+						</div>
+						<p className="font-medium">PayPal</p>
+					</div>
+				</div>
+				<p className="text-xs text-gray-400 mt-4">
+					Payments powered by{' '}
+					<a
+						href="https://intasend.com"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="underline hover:text-purple-600"
+					>
+						IntaSend
+					</a>
+				</p>
 			</div>
 		</Layout>
 	);
