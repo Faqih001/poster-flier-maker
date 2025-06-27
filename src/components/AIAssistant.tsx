@@ -83,7 +83,7 @@ export const AIAssistant = () => {
     <>
       {/* AI Assistant Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-80 h-96 bg-white rounded-2xl shadow-2xl border border-gray-200 animate-scale-in">
+        <div className="fixed bottom-32 right-6 z-50 w-80 h-96 bg-white rounded-2xl shadow-2xl border border-gray-200 animate-scale-in">
           <Card className="h-full flex flex-col border-0 shadow-none">
             <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-2xl p-4">
               <div className="flex items-center justify-between">
