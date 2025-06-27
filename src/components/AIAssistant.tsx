@@ -159,7 +159,7 @@ export const AIAssistant = () => {
       {/* AI Assistant Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-20 right-6 z-50 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white p-4 rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 hover:scale-110 group"
+        className="fixed bottom-28 right-6 z-50 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white p-4 rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 hover:scale-110 group"
         aria-label="Open AI Assistant"
       >
         <Bot className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />

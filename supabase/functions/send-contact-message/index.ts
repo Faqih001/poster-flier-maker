@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
@@ -24,9 +23,34 @@ const handler = async (req: Request): Promise<Response> => {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
 
     if (!resendApiKey) {
-      throw new Error("Resend API key not configured");
+      console.error("Missing RESEND_API_KEY environment variable");
+      return new Response(
+        JSON.stringify({ 
+          error: "Email service configuration error",
+          success: false,
+          message: "Our email service is currently unavailable. Please try contacting us via WhatsApp or email directly." 
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
     }
 
+    if (!name || !email || !subject || !message) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Missing required fields",
+          success: false,
+          message: "Please fill in all required fields." 
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+    
     const resend = new Resend(resendApiKey);
 
     // Send email to support team

@@ -36,6 +36,11 @@ const Support = () => {
     setIsSubmitting(true);
 
     try {
+      // Check network connection first
+      if (!navigator.onLine) {
+        throw new Error("You appear to be offline. Please check your internet connection and try again.");
+      }
+      
       const response = await fetch('/functions/v1/send-contact-message', {
         method: 'POST',
         headers: {
@@ -60,9 +65,17 @@ const Support = () => {
       console.error('Contact form error:', error);
       toast({
         title: "Error Sending Message",
-        description: error.message || "Please try again later or contact us directly via WhatsApp.",
+        description: error.message || "Please try again later or contact us directly via WhatsApp at +254741140250.",
         variant: "destructive",
       });
+      
+      // Add fallback notification for critical errors
+      if (error.message?.includes("configuration error") || error.message?.includes("API key")) {
+        toast({
+          title: "Alternative Contact Methods",
+          description: "Our email system is temporarily unavailable. Please contact us via WhatsApp at +254741140250 or email fakiiahmad001@gmail.com directly.",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }

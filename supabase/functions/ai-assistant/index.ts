@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const corsHeaders = {
@@ -21,7 +20,30 @@ const handler = async (req: Request): Promise<Response> => {
     const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
 
     if (!geminiApiKey) {
-      throw new Error("Gemini API key not configured");
+      console.error("Missing GEMINI_API_KEY environment variable");
+      return new Response(
+        JSON.stringify({ 
+          error: "AI service configuration error",
+          response: "I'm sorry, our AI assistant is currently unavailable. Please try again later or contact our support team at fakiiahmad001@gmail.com for assistance."
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    if (!message) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Missing message",
+          response: "Please provide a message to get a response from the AI assistant." 
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
     }
 
     const prompt = `You are a helpful AI assistant for FlierHustle, a poster and flier creation platform for small businesses and entrepreneurs in Africa. 
