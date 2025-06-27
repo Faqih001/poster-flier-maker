@@ -173,22 +173,35 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
         `high visual appeal, and appropriate for business use. ` +
         `The image should be visually striking and have a professional look.`;
       
+      // Check if we can use Supabase functions (they might be unavailable due to missing config)
+      const canUseSupabase = import.meta.env.VITE_SUPABASE_URL && 
+                           import.meta.env.VITE_SUPABASE_URL !== 'your_supabase_url_here' &&
+                           import.meta.env.VITE_SUPABASE_ANON_KEY && 
+                           import.meta.env.VITE_SUPABASE_ANON_KEY !== 'your_supabase_anon_key_here';
+      
       // First try using the Supabase function as it might be optimized for our use case
-      try {
-        const { data, error } = await supabase.functions.invoke('generate-image', {
-          body: { 
-            prompt: enhancedPrompt,
-            templateStyle: template.name
+      if (canUseSupabase) {
+        try {
+          toast.info("Generating image via Supabase function...");
+          const { data, error } = await supabase.functions.invoke('generate-image', {
+            body: { 
+              prompt: enhancedPrompt,
+              templateStyle: template.name
+            }
+          });
+          
+          if (!error && data && data.imageUrl) {
+            setGeneratedImage(data.imageUrl);
+            toast.success("Image generated successfully via Supabase function!");
+            return;
+          } else if (error) {
+            console.warn('Supabase function error:', error);
           }
-        });
-        
-        if (!error && data && data.imageUrl) {
-          setGeneratedImage(data.imageUrl);
-          toast.success("Image generated successfully via Supabase function!");
-          return;
+        } catch (supabaseError) {
+          console.warn('Supabase image generation failed, falling back to Azure DALL-E:', supabaseError);
         }
-      } catch (supabaseError) {
-        console.warn('Supabase image generation failed, falling back to Azure DALL-E:', supabaseError);
+      } else {
+        console.log('Skipping Supabase function due to missing configuration, using Azure DALL-E directly');
       }
       
       // If Supabase function fails, use Azure DALL-E directly

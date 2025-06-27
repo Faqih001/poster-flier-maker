@@ -89,15 +89,32 @@ export const AIAssistant = () => {
                           inputMessage.toLowerCase().includes('design a poster');
 
     try {
+      // Check if Supabase function URL is valid
+      let isValidFunctionUrl = false;
+      
+      if (SUPABASE_FUNCTION_URL && 
+          SUPABASE_FUNCTION_URL !== 'your_supabase_function_url_here' &&
+          !SUPABASE_FUNCTION_URL.includes('your-project-ref.supabase.co')) {
+        // Verify URL is properly formatted
+        try {
+          new URL(SUPABASE_FUNCTION_URL);
+          isValidFunctionUrl = true;
+        } catch (e) {
+          console.error('Invalid Supabase function URL format:', SUPABASE_FUNCTION_URL);
+          isValidFunctionUrl = false;
+        }
+      }
+                                
       // First try using the Supabase function (primary approach)
-      try {
-        console.log(`Calling Supabase function at: ${SUPABASE_FUNCTION_URL}`);
-        const response = await fetch(SUPABASE_FUNCTION_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+      if (isValidFunctionUrl) {
+        try {
+          console.log(`Calling Supabase function at: ${SUPABASE_FUNCTION_URL}`);
+          const response = await fetch(SUPABASE_FUNCTION_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
             message: inputMessage,
             context: 'FlierHustle poster creation assistant',
             isImageRequest: isImageRequest
