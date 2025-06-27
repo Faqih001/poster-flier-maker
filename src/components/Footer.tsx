@@ -208,7 +208,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-white/20 pt-8 flex flex-col md:flex-row justify-between items-center space-y-5 md:space-y-0">
-          <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0 text-base text-gray-400">
+          <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0 text-base text-gray-400 md:justify-start md:text-left justify-center text-center">
             <span>© 2025 FlierHustle</span>
             <span className="hidden md:inline">•</span>
             <span>Built for Hustlers in Africa</span>
