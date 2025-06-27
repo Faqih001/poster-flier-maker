@@ -52,7 +52,7 @@ export const AIAssistant = (): JSX.Element => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Hi! I\'m your FlierHustle AI assistant. How can I help you create amazing posters today?',
+      content: '## Welcome to FlierHustle! 👋\n\nI\'m your **AI assistant** here to help you create amazing posters and flyers. Here are some ways I can assist you:\n\n- Design and layout suggestions\n- Text content ideas for your posters\n- Image generation guidance\n- Template recommendations\n\nHow can I help with your poster creation today?',
       timestamp: new Date()
     }
   ]);
@@ -125,7 +125,7 @@ export const AIAssistant = (): JSX.Element => {
             // Add a special instruction for image generation requests
             apiMessages.push({
               role: "system",
-              content: "The user is requesting an image generation. Since I can't generate images directly, I'll provide a detailed description that could be used with image generation tools."
+              content: "The user is requesting an image generation. Since I can't generate images directly, I'll provide a detailed description that could be used with image generation tools. Format your response using Markdown with clear headings, bullet points, and instructions."
             });
             
             // Call the chat completions API
@@ -139,13 +139,16 @@ export const AIAssistant = (): JSX.Element => {
             });
             
             if (response.status === "200") {
-              responseContent = `I understand you'd like an image of ${inputMessage.replace(/create image of |generate image of |make an image of /i, '')}.
+              responseContent = `## Image Generation Help
+
+I understand you'd like an image of **${inputMessage.replace(/create image of |generate image of |make an image of /i, '')}**.
 
 While I can't generate images directly, here's what I'd recommend for your poster:
 
-1. Try using our poster editor feature on the dashboard
-2. In the image prompt field, use this description: "${inputMessage}"
-3. Click the "Generate AI Image" button
+1. Try using our **poster editor** feature on the dashboard
+2. In the image prompt field, use this description:
+   > "${inputMessage}"
+3. Click the "**Generate AI Image**" button
 
 Would you like me to help you with anything else about poster creation?`;
             } else {
@@ -261,11 +264,27 @@ Would you like me to help you with anything else about poster creation?`;
                         message.role === 'user'
                           ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
                           : 'bg-gray-100 text-gray-900'
-                      } ${message.role === 'assistant' ? 'prose-sm prose-headings:text-gray-900 prose-headings:font-bold prose-p:text-gray-800 prose-a:text-blue-600 prose-strong:text-gray-900 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-code:bg-gray-200 prose-code:p-0.5 prose-code:rounded' : ''}`}
+                      }`}
                     >
                       {message.role === 'assistant' ? (
                         <div className="text-xs sm:text-sm break-words">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]} className="prose-sm">
+                          <ReactMarkdown 
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              h1: ({node, ...props}) => <h1 className="text-base font-bold my-2" {...props}/>,
+                              h2: ({node, ...props}) => <h2 className="text-sm font-bold my-1.5" {...props}/>,
+                              h3: ({node, ...props}) => <h3 className="text-xs font-bold my-1" {...props}/>,
+                              p: ({node, ...props}) => <p className="my-1" {...props}/>,
+                              ul: ({node, ...props}) => <ul className="list-disc pl-4 my-1" {...props}/>,
+                              ol: ({node, ...props}) => <ol className="list-decimal pl-4 my-1" {...props}/>,
+                              li: ({node, ...props}) => <li className="my-0.5" {...props}/>,
+                              a: ({node, ...props}) => <a className="text-blue-600 underline" {...props}/>,
+                              strong: ({node, ...props}) => <strong className="font-bold" {...props}/>,
+                              em: ({node, ...props}) => <em className="italic" {...props}/>,
+                              code: ({node, ...props}) => <code className="bg-gray-200 px-1 py-0.5 rounded" {...props}/>,
+                              blockquote: ({node, ...props}) => <blockquote className="border-l-2 border-gray-300 pl-2 italic" {...props}/>
+                            }}
+                          >
                             {message.content}
                           </ReactMarkdown>
                         </div>
