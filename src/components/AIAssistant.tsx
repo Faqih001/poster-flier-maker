@@ -49,7 +49,7 @@ if (import.meta.env.DEV) {
   }
 }
 
-export const AIAssistant = () => {
+export const AIAssistant = (): JSX.Element => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -239,6 +239,7 @@ Would you like me to help you with anything else about poster creation?`;
       } else {
         throw new Error('AI service not available');
       }
+    } // <-- Add this closing brace to properly close the first try block
     } catch (error) {
       console.error('AI Assistant Error:', error);
       const errorMessage: Message = {
