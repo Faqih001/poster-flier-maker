@@ -4,7 +4,7 @@ import { Bot, X, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -12,10 +12,11 @@ interface Message {
   timestamp: Date;
 }
 
-// Initialize the Google Generative AI and Supabase URL from .env file
+// Initialize the Google GenAI and Supabase URL from .env file
 // Accessing environment variables with Vite's import.meta.env
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL;
+const GEMINI_MODEL = import.meta.env.VITE_GEMINI_MODEL || "gemini-2.5-pro";
 
 // For development, log if environment variables are missing
 if (import.meta.env.DEV && (!API_KEY || !SUPABASE_FUNCTION_URL)) {
@@ -95,39 +96,39 @@ export const AIAssistant = () => {
       
       // Fallback to client-side Gemini if API key is available
       if (API_KEY) {
-        // Initialize the Google AI with the correct API version
-        const genAI = new GoogleGenerativeAI(API_KEY);
-        // Use the correct model name - ensure v1 is used, not v1beta
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-        
-        // Prepare conversation history
-        const chatHistory = messages
-          .filter(msg => messages.indexOf(msg) > 0) // Skip the initial greeting
-          .map(msg => ({
-            role: msg.role === 'user' ? 'user' : 'model',
-            parts: [{ text: msg.content }]
-          }));
-        
-        // Create the chat session with history
-        const chat = model.startChat({
-          history: chatHistory,
-          generationConfig: { 
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
-          },
+        // Initialize the Google AI with the newer API
+        const genAI = new GoogleGenAI({
+          apiKey: API_KEY,
         });
-
-        // Add system prompt context
+        
+        // Use the latest gemini-2.5-pro model
+        const model = genAI.models;
+        
+        // Add system prompt context + conversation history
         const systemPrompt = 'You are a helpful AI assistant for FlierHustle, a poster and flier creation platform for small businesses and entrepreneurs in Africa. Keep responses under 200 words and always be encouraging about their business success.';
         
-        const result = await chat.sendMessage(systemPrompt + "\n\n" + inputMessage);
-        const response = result.response;
+        // Create conversation content with previous messages
+        const conversationContext = messages
+          .filter(msg => messages.indexOf(msg) > 0) // Skip the initial greeting
+          .map(msg => msg.content)
+          .join("\n\n");
+          
+        const fullPrompt = `${systemPrompt}\n\n${conversationContext}\n\n${inputMessage}`;
+          
+        // Send the request with the newer API
+        const response = await model.generateContent({
+          model: GEMINI_MODEL,
+          contents: fullPrompt,
+          generation_config: {
+            temperature: 0.7,
+            max_output_tokens: 1024,
+          },
+        });
         
+        // Extract the text response
         const assistantMessage: Message = {
           role: 'assistant',
-          content: response.text(),
+          content: response.text || "I'm sorry, I couldn't generate a response at this time.",
           timestamp: new Date()
         };
         
