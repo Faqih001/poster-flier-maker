@@ -21,13 +21,23 @@ const AZURE_DEPLOYMENT = import.meta.env.VITE_AZURE_DEPLOYMENT || "grok-3";
 const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL;
 
 // For development, log if environment variables are missing
-if (import.meta.env.DEV && (!AZURE_API_KEY || !SUPABASE_FUNCTION_URL)) {
-  console.warn(
-    "Missing environment variables. Make sure you've set up your .env file correctly:\n" +
-    "- VITE_AZURE_API_KEY: " + (AZURE_API_KEY ? "✓" : "✗") + "\n" +
-    "- VITE_AZURE_ENDPOINT: " + (AZURE_ENDPOINT ? "✓" : "✗") + "\n" +
-    "- VITE_SUPABASE_FUNCTION_URL: " + (SUPABASE_FUNCTION_URL ? "✓" : "✗")
-  );
+if (import.meta.env.DEV) {
+  const missingEnvVars = [];
+  if (!AZURE_API_KEY) missingEnvVars.push("VITE_AZURE_API_KEY");
+  if (!AZURE_ENDPOINT) missingEnvVars.push("VITE_AZURE_ENDPOINT");
+  if (!AZURE_DEPLOYMENT) missingEnvVars.push("VITE_AZURE_DEPLOYMENT");
+  if (!SUPABASE_FUNCTION_URL) missingEnvVars.push("VITE_SUPABASE_FUNCTION_URL");
+  
+  if (missingEnvVars.length > 0) {
+    console.warn(
+      "Missing environment variables. Make sure you've set up your .env file correctly:\n" +
+      "- VITE_AZURE_API_KEY: " + (AZURE_API_KEY ? "✓" : "✗") + "\n" +
+      "- VITE_AZURE_ENDPOINT: " + (AZURE_ENDPOINT ? "✓" : "✗") + "\n" +
+      "- VITE_AZURE_DEPLOYMENT: " + (AZURE_DEPLOYMENT ? "✓" : "✗") + "\n" +
+      "- VITE_SUPABASE_FUNCTION_URL: " + (SUPABASE_FUNCTION_URL ? "✓" : "✗") + "\n" +
+      "\nPlease check the .env.example file and create a proper .env file."
+    );
+  }
 }
 
 export const AIAssistant = () => {
@@ -35,7 +45,7 @@ export const AIAssistant = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Hi! I\'m your FlierHustle AI assistant powered by Azure Grok. How can I help you create amazing posters today?',
+      content: 'Hi! I\'m your FlierHustle AI assistant. How can I help you create amazing posters today?',
       timestamp: new Date()
     }
   ]);
@@ -105,12 +115,13 @@ export const AIAssistant = () => {
       }
       
       // Fallback to client-side Azure AI if API key is available
-      if (AZURE_API_KEY) {
+      if (AZURE_API_KEY && AZURE_ENDPOINT) {
         try {
-          // Create Azure AI client with API key authentication
-          const client = new ModelClient(AZURE_ENDPOINT, { 
-            key: AZURE_API_KEY 
-          });
+          // Create Azure AI client with API key authentication using AzureKeyCredential
+          const client = new ModelClient(
+            AZURE_ENDPOINT, 
+            new AzureKeyCredential(AZURE_API_KEY)
+          );
           
           // Prepare the messages for the Azure AI API
           const systemMessage = {
