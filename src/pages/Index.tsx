@@ -144,7 +144,8 @@ const Index = () => {
                   description: "Events, food, salons, sales, and more professional designs ready to use.",
                   color: "from-purple-500 to-pink-500",
                   bgColor: "bg-purple-100",
-                  delay: "0ms"
+                  delay: "0ms",
+                  image: "https://images.unsplash.com/photo-1611532736576-acf8ec38926b?q=80&w=800&auto=format&fit=crop"
                 },
                 {
                   icon: Wand2,
@@ -152,7 +153,8 @@ const Index = () => {
                   description: "Write catchy poster copy in one click with our smart AI assistant.",
                   color: "from-blue-500 to-cyan-500",
                   bgColor: "bg-blue-100",
-                  delay: "200ms"
+                  delay: "200ms",
+                  image: "https://images.unsplash.com/photo-1677442135306-8a5fa0204b07?q=80&w=800&auto=format&fit=crop"
                 },
                 {
                   icon: Smartphone,
@@ -160,7 +162,8 @@ const Index = () => {
                   description: "Change text, images, colors, and fonts with simple drag-and-drop.",
                   color: "from-green-500 to-emerald-500",
                   bgColor: "bg-green-100",
-                  delay: "400ms"
+                  delay: "400ms",
+                  image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?q=80&w=800&auto=format&fit=crop"
                 },
                 {
                   icon: Download,
@@ -168,7 +171,8 @@ const Index = () => {
                   description: "High-res files, print-ready formats delivered instantly.",
                   color: "from-orange-500 to-red-500",
                   bgColor: "bg-orange-100",
-                  delay: "600ms"
+                  delay: "600ms",
+                  image: "https://images.unsplash.com/photo-1559297434-fae8a1916a79?q=80&w=800&auto=format&fit=crop"
                 }
               ].map((feature, index) => (
                 <Card 
@@ -179,18 +183,35 @@ const Index = () => {
                     animationFillMode: 'both'
                   }}
                 >
-                  <CardContent className="p-8 text-center h-full flex flex-col relative">
+                  <CardContent className="p-0 text-center h-full flex flex-col relative">
+                    {/* Feature image */}
+                    <div className="w-full h-48 overflow-hidden">
+                      <img 
+                        src={feature.image} 
+                        alt={feature.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      <div className={`absolute inset-0 bg-gradient-to-b from-transparent to-white/80 z-10`}></div>
+                    </div>
+                    
                     {/* Hover gradient overlay */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
                     
-                    <div className={`w-20 h-20 ${feature.bgColor} rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg group-hover:shadow-xl relative z-10`}>
-                      <feature.icon className={`w-10 h-10 text-transparent bg-gradient-to-r ${feature.color} bg-clip-text group-hover:scale-110 transition-transform duration-300`} />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-purple-700 transition-colors duration-300">{feature.title}</h3>
-                    <p className="text-gray-600 flex-1 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">{feature.description}</p>
+                    <div className="p-8 flex flex-col relative z-20">
+                      <div className={`w-20 h-20 ${feature.bgColor} rounded-3xl flex items-center justify-center mx-auto -mt-16 mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg group-hover:shadow-xl relative border-4 border-white`}>
+                        <feature.icon className={`w-10 h-10 ${
+                          feature.title.includes("Templates") ? "text-purple-600" : 
+                          feature.title.includes("AI") ? "text-blue-600" : 
+                          feature.title.includes("Customization") ? "text-green-600" : 
+                          "text-orange-600"
+                        } group-hover:scale-110 transition-transform duration-300`} />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-purple-700 transition-colors duration-300">{feature.title}</h3>
+                      <p className="text-gray-600 flex-1 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">{feature.description}</p>
                     
-                    {/* Animated border */}
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+                      {/* Animated border */}
+                      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
