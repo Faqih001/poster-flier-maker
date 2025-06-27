@@ -304,62 +304,66 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       <div className="container mx-auto px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">
           <Button
             onClick={onBack}
             variant="ghost"
-            className="text-white hover:text-white hover:bg-white/10"
+            size="sm"
+            className="text-white hover:text-white hover:bg-white/10 text-xs sm:text-sm"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             Back to Templates
           </Button>
           
-          <div className="flex space-x-4">
+          <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4 w-full sm:w-auto">
             <Button
               onClick={generateAIText}
               disabled={isGeneratingText}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              size="sm" 
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-xs sm:text-sm flex-1 sm:flex-none"
             >
-              <Wand2 className="w-4 h-4 mr-2" />
-              {isGeneratingText ? 'Generating...' : 'AI Generate Text'}
+              <Wand2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              {isGeneratingText ? 'Generating...' : 'AI Text'}
             </Button>
 
             <Button
               onClick={handleSaveDesign}
               disabled={isSaving}
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
+              size="sm"
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-xs sm:text-sm flex-1 sm:flex-none"
             >
-              <Save className="w-4 h-4 mr-2" />
-              {isSaving ? 'Saving...' : 'Save Design'}
+              <Save className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              {isSaving ? 'Saving...' : 'Save'}
             </Button>
             
             <Button
               onClick={handleExport}
-              className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600"
+              size="sm"
+              className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-xs sm:text-sm flex-1 sm:flex-none"
             >
-              <Download className="w-4 h-4 mr-2" />
-              Export Poster
+              <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              Export
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Editing Panel */}
           <div className="lg:col-span-1 space-y-4">
             <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Save className="w-5 h-5 mr-2" />
+              <CardHeader className="px-4 py-3 sm:px-6 sm:py-4">
+                <CardTitle className="text-white flex items-center text-base sm:text-lg">
+                  <Save className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" />
                   Design Settings
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
                 <div>
-                  <label className="text-white text-sm font-medium mb-2 block">Design Title</label>
+                  <label className="text-white text-xs sm:text-sm font-medium mb-1 sm:mb-2 block">Design Title</label>
                   <Input
                     value={designTitle}
                     onChange={(e) => setDesignTitle(e.target.value)}
-                    className="bg-white/10 border-white/20 text-white placeholder-white/50"
+                    className="bg-white/10 border-white/20 text-white placeholder-white/50 text-sm"
                     placeholder="Enter design title"
                   />
                 </div>
@@ -367,9 +371,9 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
             </Card>
 
             <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Type className="w-5 h-5 mr-2" />
+              <CardHeader className="px-4 py-3 sm:px-6 sm:py-4">
+                <CardTitle className="text-white flex items-center text-base sm:text-lg">
+                  <Type className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" />
                   Text Content
                 </CardTitle>
               </CardHeader>

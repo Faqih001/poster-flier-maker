@@ -31,39 +31,39 @@ export const Footer = () => {
           {/* Logo & Description */}
           <div className="lg:col-span-1 space-y-6">
             <div className="flex items-center space-x-3 group">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <span className="text-white font-bold text-xl">F</span>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <span className="text-white font-bold text-lg sm:text-xl">F</span>
               </div>
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                 FlierHustle
               </h3>
             </div>
-            <p className="text-gray-300 text-sm leading-relaxed">
+            <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">
               AI-powered poster & flier maker designed specifically for small businesses and hustlers across Africa. 
               Create stunning designs in minutes, not hours.
             </p>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-gray-400">
-                <Shield className="w-4 h-4 text-green-400" />
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-400">
+                <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
                 <span>Secure & Trusted</span>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-400">
-                <Award className="w-4 h-4 text-yellow-400" />
+              <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-400">
+                <Award className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
                 <span>AI-Powered</span>
               </div>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-6">
-            <h4 className="text-lg font-semibold text-white flex items-center space-x-2">
-              <Zap className="w-5 h-5 text-purple-400" />
+          <div className="space-y-4 sm:space-y-6">
+            <h4 className="text-base sm:text-lg font-semibold text-white flex items-center space-x-1.5 sm:space-x-2">
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
               <span>Quick Links</span>
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-2 sm:space-y-3">
               {[
                 { to: "/", label: "Home" },
-                { to: "/templates", label: "Templates" },
+                { to: "/templates-gallery", label: "Templates" },
                 { to: "/pricing", label: "Pricing" },
                 { to: "/about", label: "About Us" },
                 { to: "/support", label: "Help Center" },
@@ -72,7 +72,7 @@ export const Footer = () => {
                 <li key={link.to}>
                   <Link 
                     to={link.to} 
-                    className="text-gray-400 hover:text-white transition-all duration-300 hover:translate-x-2 flex items-center space-x-2 group"
+                    className="text-gray-400 hover:text-white transition-all duration-300 hover:translate-x-2 flex items-center space-x-1.5 sm:space-x-2 group text-xs sm:text-sm"
                   >
                     <span className="w-1 h-1 bg-purple-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                     <span>{link.label}</span>

@@ -227,7 +227,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({ onTemplateSele
           <Badge
             key={category}
             variant={selectedCategory === category ? "default" : "secondary"}
-            className={`cursor-pointer px-6 py-3 text-sm font-medium transition-all duration-300 hover:scale-105 ${
+            className={`cursor-pointer px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 text-xs sm:text-sm font-medium transition-all duration-300 hover:scale-105 ${
               selectedCategory === category 
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg hover:shadow-xl' 
                 : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30 shadow-md'
@@ -239,7 +239,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({ onTemplateSele
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
         {filteredTemplates.map((template) => (
           <Card
             key={template.id}
@@ -269,33 +269,34 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({ onTemplateSele
                 </div>
               </div>
               
-              <div className="p-6 bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xl font-bold text-white group-hover:text-purple-200 transition-colors duration-300">
+              <div className="p-4 sm:p-5 md:p-6 bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm">
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <h3 className="text-lg sm:text-xl font-bold text-white group-hover:text-purple-200 transition-colors duration-300">
                     {template.name}
                   </h3>
-                  <Sparkles className="w-5 h-5 text-yellow-400 opacity-70" />
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 opacity-70" />
                 </div>
                 
-                <div className="flex items-center space-x-3 mb-4">
+                <div className="flex items-center space-x-3 mb-3 sm:mb-4">
                   <div className="flex items-center space-x-2">
                     <div 
-                      className="w-4 h-4 rounded-full shadow-md" 
+                      className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shadow-md" 
                       style={{ backgroundColor: template.backgroundColor }}
                     ></div>
                     <div 
-                      className="w-4 h-4 rounded-full shadow-md" 
+                      className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shadow-md" 
                       style={{ backgroundColor: template.accentColor }}
                     ></div>
                   </div>
-                  <span className="text-sm text-white/80 font-medium capitalize bg-white/10 px-2 py-1 rounded-full">
+                  <span className="text-xs sm:text-sm text-white/80 font-medium capitalize bg-white/10 px-2 py-0.5 sm:py-1 rounded-full">
                     {template.layout}
                   </span>
                 </div>
                 
                 <Button
                   onClick={() => onTemplateSelect(template)}
-                  className="w-full bg-gradient-to-r from-purple-500/80 to-blue-500/80 hover:from-purple-500 hover:to-blue-500 text-white font-medium transition-all duration-300 hover:shadow-lg"
+                  size="sm"
+                  className="w-full bg-gradient-to-r from-purple-500/80 to-blue-500/80 hover:from-purple-500 hover:to-blue-500 text-white text-xs sm:text-sm md:text-base font-medium transition-all duration-300 hover:shadow-lg"
                 >
                   Select Template
                 </Button>

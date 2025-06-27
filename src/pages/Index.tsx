@@ -91,53 +91,53 @@ const Index = () => {
               <span className="text-purple-300 font-semibold"> Fast. Affordable. Professional.</span>
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
               <Button
                 onClick={() => navigate('/create')}
                 size="lg"
-                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white text-lg px-10 py-6 rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 group"
+                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white text-base sm:text-lg px-6 sm:px-8 md:px-10 py-5 sm:py-6 rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 group w-full sm:w-auto"
               >
-                <Sparkles className="w-5 h-5 mr-2" />
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Create a Poster
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </Button>
               <Button
                 onClick={() => navigate('/pricing')}
                 variant="outline"
                 size="lg"
-                className="border-2 border-white/50 text-white bg-white/20 hover:bg-white hover:text-purple-900 text-lg px-10 py-6 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 font-medium"
+                className="border-2 border-white/50 text-white bg-white/20 hover:bg-white hover:text-purple-900 text-base sm:text-lg px-6 sm:px-8 md:px-10 py-5 sm:py-6 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 font-medium w-full sm:w-auto"
               >
                 View Pricing
               </Button>
             </div>
             
-            <div className="flex items-center justify-center space-x-8 mt-12 text-white/80">
+            <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-4 md:space-x-6 lg:space-x-8 mt-8 sm:mt-10 md:mt-12 text-white/80 space-y-3 sm:space-y-0">
               <div className="flex items-center space-x-2">
-                <Users className="w-5 h-5 text-green-400" />
-                <span className="text-sm">10,000+ Hustlers</span>
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
+                <span className="text-xs sm:text-sm">10,000+ Hustlers</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Globe className="w-5 h-5 text-blue-400" />
-                <span className="text-sm">Across Africa</span>
+                <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+                <span className="text-xs sm:text-sm">Across Africa</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Palette className="w-5 h-5 text-purple-400" />
-                <span className="text-sm">1000+ Templates</span>
+                <Palette className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
+                <span className="text-xs sm:text-sm">1000+ Templates</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Key Features Section - Enhanced */}
-        <div className="bg-white py-20 relative overflow-hidden">
+        <div className="bg-white py-12 sm:py-16 md:py-20 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-blue-50"></div>
           <div className="container mx-auto px-4 relative z-10">
-            <div className="text-center mb-16">
-              <Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-2 mb-6 text-sm font-medium">
+            <div className="text-center mb-10 sm:mb-12 md:mb-16">
+              <Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 sm:px-6 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm font-medium">
                 🚀 Powerful Features
               </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Why Choose FlierHustle?</h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">Powerful features designed to make your business stand out</p>
+              <h2 className="h2 text-gray-900 mb-3 sm:mb-4">Why Choose FlierHustle?</h2>
+              <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Powerful features designed to make your business stand out</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
