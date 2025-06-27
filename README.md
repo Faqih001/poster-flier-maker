@@ -90,6 +90,47 @@ NEXTAUTH_URL=http://localhost:8080
 - For production, set environment variables through your hosting platform's secure environment configuration
 - Consider rotating API keys periodically for enhanced security
 
+## AI Integration
+
+This project uses Azure OpenAI Service for AI functionalities:
+
+1. **Text Generation**: Uses Azure's Grok-3 model for generating poster text content
+2. **Image Generation**: Uses Azure's DALL-E 3 model for generating poster images
+
+### Setting up Azure AI
+
+1. Create an Azure account if you don't have one
+2. Set up an Azure OpenAI Service resource
+3. Deploy the following models in your Azure OpenAI Service:
+   - Deploy `grok-3` for text generation
+   - Deploy `dall-e-3` for image generation
+4. Copy your API keys and endpoints from the Azure portal
+5. Configure your environment variables (see below)
+
+### Environment Variables
+
+Copy the `.env.example` file to create a new `.env` file:
+
+```bash
+cp .env.example .env
+```
+
+Then update the following environment variables with your Azure credentials:
+
+```
+VITE_AZURE_API_KEY=your_azure_api_key_here
+VITE_AZURE_ENDPOINT=https://your-azure-endpoint.cognitiveservices.azure.com/models
+VITE_AZURE_DEPLOYMENT=grok-3
+
+VITE_AZURE_DALLE_DEPLOYMENT=dall-e-3
+VITE_AZURE_DALLE_ENDPOINT=https://your-azure-endpoint.cognitiveservices.azure.com/openai/deployments/dall-e-3/images/generations?api-version=2024-02-01
+VITE_AZURE_DALLE_API_KEY=your_azure_api_key_here
+```
+
+### Fallback Mechanism
+
+The application includes a fallback mechanism using Supabase functions if the direct Azure API calls fail. This ensures the application remains functional even if there are temporary issues with the Azure API.
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/419f2799-3fcc-4c19-bbc8-60f13b08a400) and click on Share -> Publish.
