@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDesigns } from '@/hooks/useDesigns';
-import { GoogleGenerativeAI, Modality } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface PosterEditorProps {
   template: Template;
@@ -53,7 +53,7 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
       
       const genAI = new GoogleGenerativeAI(API_KEY);
       const model = genAI.getGenerativeModel({
-        model: "gemini-2.5-pro"
+        model: "gemini-1.5-pro"
       });
       
       // Create a prompt based on the template type to generate appropriate text
@@ -75,9 +75,19 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
         }
       `;
       
-      // Generate the text content
-      const response = await model.generateContent(prompt);
-      const responseText = response.response.text();
+      // Generate the text content with structured format
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        }
+      });
+      
+      const response = await result.response;
+      const responseText = response.text();
       
       // Extract the JSON part from the response
       const jsonMatch = responseText.match(/{[\s\S]*}/);
@@ -145,34 +155,52 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
         `Make it suitable for a business poster, with clean design, ` +
         `high visual appeal, and appropriate for ${template.name} style.`;
       
-      // Generate the image using gemini-2.0-flash-preview-image-generation
-      const imageModel = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash-preview-image-generation",
-        modelConfig: {
-          responseModalities: [Modality.TEXT, Modality.IMAGE],
+      // For image generation, we'll use the Supabase function as the primary method
+      // This avoids compatibility issues with the current SDK version
+      const { data, error } = await supabase.functions.invoke('generate-image', {
+        body: { 
+          prompt: enhancedPrompt,
+          templateStyle: template.name
         }
       });
       
-      const response = await imageModel.generateContent(enhancedPrompt);
+      if (error) throw error;
       
-      // Extract the image from the response
-      let imageBase64 = null;
-      
-      for (const part of response.response.candidates[0].content.parts) {
-        if (part.inlineData) {
-          imageBase64 = part.inlineData.data;
-          break;
-        }
+      if (data && data.imageUrl) {
+        setGeneratedImage(data.imageUrl);
+        return toast.success("Image generated successfully!");
       }
       
-      if (imageBase64) {
-        // Convert base64 to a URL that can be displayed in the component
-        const imageUrl = `data:image/png;base64,${imageBase64}`;
-        setGeneratedImage(imageUrl);
-        toast.success("AI image generated successfully!");
-      } else {
-        throw new Error("No image was generated. Please try a different prompt.");
-      }
+      // If Supabase function fails, try with direct API
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash" 
+      });
+      
+      // Configure the generation parameters
+      const generationConfig = {
+        temperature: 0.4,
+        topK: 32,
+        topP: 1,
+        maxOutputTokens: 2048,
+      };
+      
+      // Generate content - for text only since image generation has specific requirements
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: enhancedPrompt }] }],
+        generationConfig
+      });
+      
+      // At this point, we're only using the text model as a fallback for additional suggestions
+      const response = await result.response;
+      const text = response.text();
+      
+      // Since we couldn't generate an image directly, let's show a placeholder or sample image
+      // Display an appropriate message to the user
+      toast.error("Image generation failed. Please try a different prompt or try again later.");
+      
+      // We could set a placeholder image here if needed
+      // For now, we'll leave the image area empty so the user knows to try again
+      // This approach is cleaner than showing a potentially unrelated image
     } catch (error) {
       console.error('Error generating image:', error);
       toast.error("Failed to generate image. Please try again with a different prompt.");
