@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +9,9 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDesigns } from '@/hooks/useDesigns';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import ModelClient from '@azure-rest/ai-inference';
+import { AzureKeyCredential } from '@azure/core-auth';
+import axios from 'axios';
 
 interface PosterEditorProps {
   template: Template;
@@ -20,6 +21,18 @@ interface PosterEditorProps {
 export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) => {
   const { user } = useAuth();
   const { saveDesign } = useDesigns();
+  
+  // Azure AI configuration
+  const AZURE_API_KEY = import.meta.env.VITE_AZURE_API_KEY;
+  const AZURE_ENDPOINT = import.meta.env.VITE_AZURE_ENDPOINT;
+  const AZURE_DEPLOYMENT = import.meta.env.VITE_AZURE_DEPLOYMENT || "grok-3"; // Text generation model
+  
+  // Azure DALL-E configuration for image generation
+  const AZURE_DALLE_DEPLOYMENT = import.meta.env.VITE_AZURE_DALLE_DEPLOYMENT || "dall-e-3";
+  const AZURE_DALLE_ENDPOINT = import.meta.env.VITE_AZURE_DALLE_ENDPOINT || 
+    (AZURE_ENDPOINT ? `${AZURE_ENDPOINT}/openai/deployments/${AZURE_DALLE_DEPLOYMENT}/images/generations?api-version=2024-02-01` : '');
+  const AZURE_DALLE_API_KEY = import.meta.env.VITE_AZURE_DALLE_API_KEY || AZURE_API_KEY;
+  
   const [posterText, setPosterText] = useState({
     headline: 'Your Amazing Offer',
     subheading: 'Limited Time Special',
@@ -45,19 +58,21 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
   const generateAIText = async () => {
     setIsGeneratingText(true);
     try {
-      // Initialize the Google Generative AI with API key from environment
-      const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!API_KEY) {
-        throw new Error("Gemini API key is missing. Please check your environment variables.");
+      // Check if Azure API key and endpoint are available
+      if (!AZURE_API_KEY || !AZURE_ENDPOINT) {
+        throw new Error("Azure API key or endpoint is missing. Please check your environment variables.");
       }
       
-      const genAI = new GoogleGenerativeAI(API_KEY);
-      const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-pro"
-      });
+      // Create Azure AI client
+      const client = new ModelClient(
+        AZURE_ENDPOINT,
+        new AzureKeyCredential(AZURE_API_KEY)
+      );
       
       // Create a prompt based on the template type to generate appropriate text
-      const prompt = `
+      const systemPrompt = "You are a creative marketing assistant that specializes in creating compelling poster text content. Always respond in JSON format only.";
+      
+      const userPrompt = `
         Generate creative and compelling text content for a ${template.name} poster.
         The text should include:
         1. An attention-grabbing headline (short and impactful, can include emojis if appropriate)
@@ -75,28 +90,33 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
         }
       `;
       
-      // Generate the text content with structured format
-      const result = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
+      // Prepare messages for chat completion
+      const messages = [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ];
+      
+      // Send request to Azure OpenAI
+      const response = await client.path("/chat/completions").post({
+        body: {
+          messages: messages,
+          max_tokens: 1000,
           temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1024,
+          model: AZURE_DEPLOYMENT || "grok-3"
+          // Note: response_format is not yet supported in all Azure OpenAI versions
         }
       });
       
-      const response = await result.response;
-      const responseText = response.text();
+      // Extract text from response
+      const responseText = response.body.choices[0].message.content;
       
-      // Extract the JSON part from the response
-      const jsonMatch = responseText.match(/{[\s\S]*}/);
-      
-      if (jsonMatch) {
-        const posterContent = JSON.parse(jsonMatch[0]);
+      try {
+        // Parse JSON response
+        const posterContent = JSON.parse(responseText);
         setPosterText(posterContent);
         toast.success("AI text generated successfully!");
-      } else {
+      } catch (jsonError) {
+        // Fallback to predefined suggestions if JSON parsing fails
         // Fallback to predefined suggestions if JSON parsing fails
         const suggestions = [
           {
