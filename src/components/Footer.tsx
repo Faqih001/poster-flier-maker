@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter, MessageCircle, Mail, Phone, MapPin, Heart, Zap, Shield, Award, Send, CheckCircle } from 'lucide-react';
@@ -7,13 +6,30 @@ import { Button } from '@/components/ui/button';
 export const Footer = () => {
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [confirmationSent, setConfirmationSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (email) {
-      setIsSubscribed(true);
-      setEmail('');
-      setTimeout(() => setIsSubscribed(false), 3000);
+      try {
+        const res = await fetch('/api/send-newsletter-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        if (!res.ok) throw new Error('Failed to send confirmation email');
+        setIsSubscribed(true);
+        setConfirmationSent(true);
+        setEmail('');
+        setTimeout(() => {
+          setIsSubscribed(false);
+          setConfirmationSent(false);
+        }, 6000);
+      } catch (err) {
+        setError('Failed to send confirmation email. Please try again.');
+      }
     }
   };
 
@@ -153,9 +169,12 @@ export const Footer = () => {
               </p>
               
               {isSubscribed ? (
-                <div className="flex items-center space-x-2 text-green-400 bg-green-500/10 rounded-lg p-4 border border-green-500/20">
+                <div className="flex flex-col items-center space-y-2 text-green-400 bg-green-500/10 rounded-lg p-4 border border-green-500/20">
                   <CheckCircle className="w-6 h-6" />
                   <span className="text-base font-medium">Successfully subscribed!</span>
+                  {confirmationSent && (
+                    <span className="text-green-300 text-sm text-center">Check your inbox to confirm your subscription.</span>
+                  )}
                 </div>
               ) : (
                 <form onSubmit={handleSubscribe} className="space-y-4">
@@ -177,6 +196,7 @@ export const Footer = () => {
                     <Send className="w-5 h-5 mr-2" />
                     Subscribe Now
                   </Button>
+                  {error && <p className="text-red-400 text-sm text-center mt-2">{error}</p>}
                 </form>
               )}
               
