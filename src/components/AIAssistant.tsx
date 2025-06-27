@@ -18,13 +18,14 @@ interface Message {
 // Accessing environment variables with Vite's import.meta.env
 const AZURE_API_KEY = import.meta.env.VITE_AZURE_API_KEY;
 const AZURE_ENDPOINT = import.meta.env.VITE_AZURE_ENDPOINT;
-const AZURE_DEPLOYMENT = import.meta.env.VITE_AZURE_DEPLOYMENT || "grok-3";
+const AZURE_DEPLOYMENT = import.meta.env.VITE_AZURE_DEPLOYMENT || "grok-3"; // Default to grok-3 for text generation
 const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL;
 
 // DALL-E image generation configuration
+const AZURE_DALLE_DEPLOYMENT = import.meta.env.VITE_AZURE_DALLE_DEPLOYMENT || "dall-e-3"; // Default to dall-e-3 for image generation
 const AZURE_DALLE_ENDPOINT = import.meta.env.VITE_AZURE_DALLE_ENDPOINT || 
-  (AZURE_ENDPOINT ? `${AZURE_ENDPOINT}/openai/deployments/dall-e-3/images/generations?api-version=2024-02-01` : '');
-const AZURE_DALLE_API_KEY = import.meta.env.VITE_AZURE_DALLE_API_KEY || AZURE_API_KEY;
+  (AZURE_ENDPOINT ? `${AZURE_ENDPOINT}/openai/deployments/${AZURE_DALLE_DEPLOYMENT}/images/generations?api-version=2024-02-01` : '');
+const AZURE_DALLE_API_KEY = import.meta.env.VITE_AZURE_DALLE_API_KEY || AZURE_API_KEY; // Use the same API key if not specified separately
 
 // For development, log if environment variables are missing
 if (import.meta.env.DEV) {
