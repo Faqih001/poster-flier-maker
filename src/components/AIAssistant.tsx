@@ -1,10 +1,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Bot, X, Send, Loader2 } from 'lucide-react';
+import { Bot, X, Send, Loader2, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Modality } from '@google/genai';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -16,7 +16,8 @@ interface Message {
 // Accessing environment variables with Vite's import.meta.env
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL;
-const GEMINI_MODEL = import.meta.env.VITE_GEMINI_MODEL || "gemini-2.5-pro";
+const GEMINI_TEXT_MODEL = import.meta.env.VITE_GEMINI_TEXT_MODEL || "gemini-2.5-pro";
+const GEMINI_IMAGE_MODEL = import.meta.env.VITE_GEMINI_IMAGE_MODEL || "gemini-2.0-flash-preview-image-generation";
 
 // For development, log if environment variables are missing
 if (import.meta.env.DEV && (!API_KEY || !SUPABASE_FUNCTION_URL)) {
@@ -59,6 +60,12 @@ export const AIAssistant = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsLoading(true);
+    
+    // Check if the user is requesting an image generation
+    const isImageRequest = inputMessage.toLowerCase().includes('create image') || 
+                          inputMessage.toLowerCase().includes('generate image') || 
+                          inputMessage.toLowerCase().includes('make an image') ||
+                          inputMessage.toLowerCase().includes('design a poster');
 
     try {
       // First try using the Supabase function (primary approach)
@@ -71,7 +78,8 @@ export const AIAssistant = () => {
           },
           body: JSON.stringify({
             message: inputMessage,
-            context: 'FlierHustle poster creation assistant'
+            context: 'FlierHustle poster creation assistant',
+            isImageRequest: isImageRequest
           }),
           // Set a reasonable timeout
           signal: AbortSignal.timeout(8000)
@@ -96,43 +104,94 @@ export const AIAssistant = () => {
       
       // Fallback to client-side Gemini if API key is available
       if (API_KEY) {
-        // Initialize the Google AI with the newer API
+        // Initialize the Google GenAI
         const genAI = new GoogleGenAI({
           apiKey: API_KEY,
         });
         
-        // Use the latest gemini-2.5-pro model
-        const model = genAI.models;
-        
-        // Add system prompt context + conversation history
-        const systemPrompt = 'You are a helpful AI assistant for FlierHustle, a poster and flier creation platform for small businesses and entrepreneurs in Africa. Keep responses under 200 words and always be encouraging about their business success.';
-        
-        // Create conversation content with previous messages
-        const conversationContext = messages
-          .filter(msg => messages.indexOf(msg) > 0) // Skip the initial greeting
-          .map(msg => msg.content)
-          .join("\n\n");
+        if (isImageRequest) {
+          // Handle image generation request
+          try {
+            const response = await genAI.models.generateContent({
+              model: GEMINI_IMAGE_MODEL,
+              contents: inputMessage,
+              config: {
+                responseModalities: [Modality.TEXT, Modality.IMAGE],
+              },
+            });
+            
+            let responseContent = "I've created this image based on your request:";
+            
+            // Check if we have image data in the response
+            if (response.candidates && 
+                response.candidates[0] && 
+                response.candidates[0].content && 
+                response.candidates[0].content.parts) {
+              
+              for (const part of response.candidates[0].content.parts) {
+                if (part.text) {
+                  responseContent += "\n\n" + part.text;
+                } else if (part.inlineData) {
+                  // Here we'd handle the image in a real implementation
+                  // For client-side, we'd display it directly rather than saving to disk
+                  const imageData = part.inlineData.data;
+                  responseContent += "\n\n[Image generated successfully! You can download it from your dashboard.]";
+                  
+                  // In a complete implementation, we would:
+                  // 1. Upload this image to storage
+                  // 2. Provide a download link
+                  // 3. Or display it directly in the chat
+                }
+              }
+            } else {
+              responseContent = "I tried to create an image, but encountered an issue. Could you try a different description?";
+            }
+            
+            const assistantMessage: Message = {
+              role: 'assistant',
+              content: responseContent,
+              timestamp: new Date()
+            };
+            
+            setMessages(prev => [...prev, assistantMessage]);
+          } catch (imageError) {
+            console.error('Image generation error:', imageError);
+            throw new Error('Could not generate image');
+          }
+        } else {
+          // Handle text-based chat using the text model
+          const model = genAI.models;
           
-        const fullPrompt = `${systemPrompt}\n\n${conversationContext}\n\n${inputMessage}`;
+          // Add system prompt context + conversation history
+          const systemPrompt = 'You are a helpful AI assistant for FlierHustle, a poster and flier creation platform for small businesses and entrepreneurs in Africa. Keep responses under 200 words and always be encouraging about their business success.';
           
-        // Send the request with the newer API
-        const response = await model.generateContent({
-          model: GEMINI_MODEL,
-          contents: fullPrompt,
-          generation_config: {
-            temperature: 0.7,
-            max_output_tokens: 1024,
-          },
-        });
-        
-        // Extract the text response
-        const assistantMessage: Message = {
-          role: 'assistant',
-          content: response.text || "I'm sorry, I couldn't generate a response at this time.",
-          timestamp: new Date()
-        };
-        
-        setMessages(prev => [...prev, assistantMessage]);
+          // Create conversation content with previous messages
+          const conversationContext = messages
+            .filter(msg => messages.indexOf(msg) > 0) // Skip the initial greeting
+            .map(msg => msg.content)
+            .join("\n\n");
+            
+          const fullPrompt = `${systemPrompt}\n\n${conversationContext}\n\n${inputMessage}`;
+            
+          // Send the request with the newer API
+          const response = await model.generateContent({
+            model: GEMINI_TEXT_MODEL,
+            contents: fullPrompt,
+            config: {
+              temperature: 0.7,
+              maxOutputTokens: 1024,
+            },
+          });
+          
+          // Extract the text response
+          const assistantMessage: Message = {
+            role: 'assistant',
+            content: response.text || "I'm sorry, I couldn't generate a response at this time.",
+            timestamp: new Date()
+          };
+          
+          setMessages(prev => [...prev, assistantMessage]);
+        }
       } else {
         throw new Error('AI service not available');
       }

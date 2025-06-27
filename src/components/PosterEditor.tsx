@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDesigns } from '@/hooks/useDesigns';
+import { GoogleGenerativeAI, Modality } from '@google/generative-ai';
 
 interface PosterEditorProps {
   template: Template;
@@ -43,28 +44,83 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
 
   const generateAIText = async () => {
     setIsGeneratingText(true);
-    // Simulate AI text generation
-    setTimeout(() => {
-      const suggestions = [
-        {
-          headline: '🔥 MEGA SALE ALERT! 🔥',
-          subheading: 'Up to 70% OFF Everything',
-          description: 'Limited time offer! Shop now and save big on all your favorite items. Don\'t let this amazing deal slip away!',
-          cta: 'Shop Now - Call: +254 XXX XXX XXX'
-        },
-        {
-          headline: 'Grand Opening Special',
-          subheading: 'New Store, New Deals',
-          description: 'Celebrate with us! Exclusive opening discounts, free gifts, and amazing prizes await you.',
-          cta: 'Visit Today - WhatsApp: +254 XXX XXX XXX'
-        }
-      ];
+    try {
+      // Initialize the Google Generative AI with API key from environment
+      const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!API_KEY) {
+        throw new Error("Gemini API key is missing. Please check your environment variables.");
+      }
       
-      const randomSuggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
-      setPosterText(randomSuggestion);
+      const genAI = new GoogleGenerativeAI(API_KEY);
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-pro"
+      });
+      
+      // Create a prompt based on the template type to generate appropriate text
+      const prompt = `
+        Generate creative and compelling text content for a ${template.name} poster.
+        The text should include:
+        1. An attention-grabbing headline (short and impactful, can include emojis if appropriate)
+        2. A brief subheading (1-2 lines)
+        3. A short description paragraph (2-3 lines max)
+        4. A call to action with placeholder phone number (+254 XXX XXX XXX)
+        
+        The tone should be professional but engaging, appropriate for business marketing.
+        Return ONLY in JSON format like this:
+        {
+          "headline": "Your headline here",
+          "subheading": "Your subheading here",
+          "description": "Your description here",
+          "cta": "Your call to action here"
+        }
+      `;
+      
+      // Generate the text content
+      const response = await model.generateContent(prompt);
+      const responseText = response.response.text();
+      
+      // Extract the JSON part from the response
+      const jsonMatch = responseText.match(/{[\s\S]*}/);
+      
+      if (jsonMatch) {
+        const posterContent = JSON.parse(jsonMatch[0]);
+        setPosterText(posterContent);
+        toast.success("AI text generated successfully!");
+      } else {
+        // Fallback to predefined suggestions if JSON parsing fails
+        const suggestions = [
+          {
+            headline: '🔥 MEGA SALE ALERT! 🔥',
+            subheading: 'Up to 70% OFF Everything',
+            description: 'Limited time offer! Shop now and save big on all your favorite items. Don\'t let this amazing deal slip away!',
+            cta: 'Shop Now - Call: +254 XXX XXX XXX'
+          },
+          {
+            headline: 'Grand Opening Special',
+            subheading: 'New Store, New Deals',
+            description: 'Celebrate with us! Exclusive opening discounts, free gifts, and amazing prizes await you.',
+            cta: 'Visit Today - WhatsApp: +254 XXX XXX XXX'
+          }
+        ];
+        
+        const randomSuggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
+        setPosterText(randomSuggestion);
+        toast.warning("Using example text. Try again for AI-generated content.");
+      }
+    } catch (error) {
+      console.error('Error generating text:', error);
+      toast.error("Failed to generate text. Using example content instead.");
+      
+      // Fallback content
+      setPosterText({
+        headline: 'Your Amazing Offer',
+        subheading: 'Limited Time Special',
+        description: 'Don\'t miss out on this incredible opportunity. Visit us today!',
+        cta: 'Call Now: +254 XXX XXX XXX'
+      });
+    } finally {
       setIsGeneratingText(false);
-      toast.success("AI text generated successfully!");
-    }, 2000);
+    }
   };
 
   const generateAIImage = async () => {
@@ -75,23 +131,51 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
 
     setIsGeneratingImage(true);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-image', {
-        body: { prompt: imagePrompt }
-      });
-
-      if (error) {
-        throw error;
+      // Initialize the Google Generative AI with API key from environment
+      const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!API_KEY) {
+        throw new Error("Gemini API key is missing. Please check your environment variables.");
       }
-
-      if (data.success && data.image) {
-        setGeneratedImage(data.image);
+      
+      const genAI = new GoogleGenerativeAI(API_KEY);
+      
+      // Construct a prompt that will work well with the poster design
+      const enhancedPrompt = 
+        `Create a professional poster image for: ${imagePrompt}. ` +
+        `Make it suitable for a business poster, with clean design, ` +
+        `high visual appeal, and appropriate for ${template.name} style.`;
+      
+      // Generate the image using gemini-2.0-flash-preview-image-generation
+      const imageModel = genAI.getGenerativeModel({
+        model: "gemini-2.0-flash-preview-image-generation",
+        modelConfig: {
+          responseModalities: [Modality.TEXT, Modality.IMAGE],
+        }
+      });
+      
+      const response = await imageModel.generateContent(enhancedPrompt);
+      
+      // Extract the image from the response
+      let imageBase64 = null;
+      
+      for (const part of response.response.candidates[0].content.parts) {
+        if (part.inlineData) {
+          imageBase64 = part.inlineData.data;
+          break;
+        }
+      }
+      
+      if (imageBase64) {
+        // Convert base64 to a URL that can be displayed in the component
+        const imageUrl = `data:image/png;base64,${imageBase64}`;
+        setGeneratedImage(imageUrl);
         toast.success("AI image generated successfully!");
       } else {
-        throw new Error(data.error || 'Failed to generate image');
+        throw new Error("No image was generated. Please try a different prompt.");
       }
     } catch (error) {
       console.error('Error generating image:', error);
-      toast.error("Failed to generate image. Please try again.");
+      toast.error("Failed to generate image. Please try again with a different prompt.");
     } finally {
       setIsGeneratingImage(false);
     }
