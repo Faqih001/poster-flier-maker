@@ -35,8 +35,6 @@ const Index = () => {
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center fixed inset-0">
         <div className="text-center max-w-md mx-auto px-6">
           <div className="relative mx-auto">
-            {/* Outer ring */}
-            <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
             {/* Animated spinner */}
             <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-l-4 border-r-4 border-b-transparent border-white mx-auto"></div>
             {/* Inner glow */}
