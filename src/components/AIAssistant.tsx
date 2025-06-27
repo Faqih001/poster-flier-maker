@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, X, Send, Loader2, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,6 +19,7 @@ const AZURE_API_KEY = import.meta.env.VITE_AZURE_API_KEY;
 const AZURE_ENDPOINT = import.meta.env.VITE_AZURE_ENDPOINT;
 const AZURE_DEPLOYMENT = import.meta.env.VITE_AZURE_DEPLOYMENT || "grok-3"; // Default to grok-3 for text generation
 const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // DALL-E image generation configuration
 const AZURE_DALLE_DEPLOYMENT = import.meta.env.VITE_AZURE_DALLE_DEPLOYMENT || "dall-e-3"; // Default to dall-e-3 for image generation
@@ -34,6 +34,7 @@ if (import.meta.env.DEV) {
   if (!AZURE_ENDPOINT) missingEnvVars.push("VITE_AZURE_ENDPOINT");
   if (!AZURE_DEPLOYMENT) missingEnvVars.push("VITE_AZURE_DEPLOYMENT");
   if (!SUPABASE_FUNCTION_URL) missingEnvVars.push("VITE_SUPABASE_FUNCTION_URL");
+  if (!SUPABASE_ANON_KEY) missingEnvVars.push("VITE_SUPABASE_ANON_KEY");
   
   if (missingEnvVars.length > 0) {
     console.warn(
@@ -44,6 +45,7 @@ if (import.meta.env.DEV) {
       "- VITE_AZURE_DALLE_DEPLOYMENT: " + (AZURE_DALLE_DEPLOYMENT ? "✓" : "✗") + " (should be dall-e-3)" + "\n" +
       "- VITE_AZURE_DALLE_ENDPOINT: " + (AZURE_DALLE_ENDPOINT ? "✓" : "✗") + "\n" +
       "- VITE_SUPABASE_FUNCTION_URL: " + (SUPABASE_FUNCTION_URL ? "✓" : "✗") + "\n" +
+      "- VITE_SUPABASE_ANON_KEY: " + (SUPABASE_ANON_KEY ? "✓" : "✗") + "\n" +
       "\nPlease check the .env.example file and create a proper .env file."
     );
   }
