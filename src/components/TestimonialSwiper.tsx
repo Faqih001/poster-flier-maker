@@ -9,42 +9,42 @@ const testimonials = [
     name: "Sarah K.",
     business: "Food Vendor, Nairobi",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1494790108755-2616c669a2f9?w=150&h=150&fit=crop&crop=face"
+    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face"
   },
   {
     quote: "No more waiting on designers! I can create professional event flyers whenever I need them. The AI text generator is incredible!",
     name: "John M.",
     business: "Event Organizer, Mombasa",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face"
   },
   {
     quote: "The AI text generator is amazing. It writes better copy than I ever could! My salon's social media engagement has doubled.",
     name: "Grace W.",
     business: "Salon Owner, Kisumu",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+    image: "https://images.unsplash.com/photo-1534751516642-a1af1ef26a56?w=150&h=150&fit=crop&crop=face"
   },
   {
     quote: "FlierHustle helped me create stunning product launch posters that attracted hundreds of customers. Worth every shilling!",
     name: "David O.",
     business: "Electronics Shop, Eldoret",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face"
   },
   {
     quote: "From zero design skills to creating beautiful restaurant menus and promotions. This tool is perfect for hustlers like me!",
     name: "Amina H.",
     business: "Restaurant Owner, Nakuru",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=150&h=150&fit=crop&crop=face"
+    image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&h=150&fit=crop&crop=face"
   },
   {
     quote: "The templates are exactly what I needed for my fashion boutique. Professional, modern, and eye-catching designs!",
     name: "Mary L.",
     business: "Fashion Boutique, Machakos",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face"
+    image: "https://images.unsplash.com/photo-1558898479-33c0057a5d12?w=150&h=150&fit=crop&crop=face"
   }
 ];
 
