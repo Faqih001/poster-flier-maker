@@ -161,61 +161,74 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
 
     setIsGeneratingImage(true);
     try {
-      // Initialize the Google Generative AI with API key from environment
-      const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!API_KEY) {
-        throw new Error("Gemini API key is missing. Please check your environment variables.");
+      // Check for Azure DALL-E API configuration
+      if (!AZURE_DALLE_API_KEY || !AZURE_DALLE_ENDPOINT) {
+        throw new Error("Azure DALL-E API key or endpoint is missing. Please check your environment variables.");
       }
-      
-      const genAI = new GoogleGenerativeAI(API_KEY);
       
       // Construct a prompt that will work well with the poster design
       const enhancedPrompt = 
         `Create a professional poster image for: ${imagePrompt}. ` +
-        `Make it suitable for a business poster, with clean design, ` +
-        `high visual appeal, and appropriate for ${template.name} style.`;
+        `Make it suitable for a ${template.name} poster, with clean design, ` +
+        `high visual appeal, and appropriate for business use. ` +
+        `The image should be visually striking and have a professional look.`;
       
-      // For image generation, we'll use the Supabase function as the primary method
-      // This avoids compatibility issues with the current SDK version
-      const { data, error } = await supabase.functions.invoke('generate-image', {
-        body: { 
-          prompt: enhancedPrompt,
-          templateStyle: template.name
+      // First try using the Supabase function as it might be optimized for our use case
+      try {
+        const { data, error } = await supabase.functions.invoke('generate-image', {
+          body: { 
+            prompt: enhancedPrompt,
+            templateStyle: template.name
+          }
+        });
+        
+        if (!error && data && data.imageUrl) {
+          setGeneratedImage(data.imageUrl);
+          toast.success("Image generated successfully via Supabase function!");
+          return;
         }
-      });
-      
-      if (error) throw error;
-      
-      if (data && data.imageUrl) {
-        setGeneratedImage(data.imageUrl);
-        return toast.success("Image generated successfully!");
+      } catch (supabaseError) {
+        console.warn('Supabase image generation failed, falling back to Azure DALL-E:', supabaseError);
       }
       
-      // If Supabase function fails, try with direct API
-      const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash" 
-      });
+      // If Supabase function fails, use Azure DALL-E directly
+      toast.info("Generating image with Azure DALL-E...");
       
-      // Configure the generation parameters
-      const generationConfig = {
-        temperature: 0.4,
-        topK: 32,
-        topP: 1,
-        maxOutputTokens: 2048,
-      };
+      try {
+        // Make API request to Azure DALL-E
+        const response = await axios.post(
+          AZURE_DALLE_ENDPOINT,
+          {
+            prompt: enhancedPrompt,
+            n: 1,
+            size: '1024x1024',
+            response_format: 'url'
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'api-key': AZURE_DALLE_API_KEY
+            }
+          }
+        );
+        
+        // Extract the image URL from the response
+        if (response.data && response.data.data && response.data.data.length > 0) {
+          const imageUrl = response.data.data[0].url;
+          setGeneratedImage(imageUrl);
+          toast.success("Image generated successfully via Azure DALL-E!");
+        } else {
+          throw new Error("No image was generated. Please try a different prompt.");
+        }
+      } catch (dalleError) {
+        console.error('Azure DALL-E error:', dalleError);
+        throw new Error("Failed to generate image with Azure DALL-E. Please try a different prompt.");
+      }
+    } catch (error) {
+      console.error('Error generating image:', error);
+      toast.error("Failed to generate image. Using a placeholder instead.");
       
-      // Generate content - for text only since image generation has specific requirements
-      const result = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: enhancedPrompt }] }],
-        generationConfig
-      });
-      
-      // At this point, we're only using the text model as a fallback for additional suggestions
-      const response = await result.response;
-      const text = response.text();
-      
-      // Since direct image generation failed, let's try to use a relevant placeholder
-      // based on the template type
+      // Fallback to a placeholder image based on the template type
       const placeholderImages = {
         'Business': '/placeholders/business.jpg',
         'Event': '/placeholders/event.jpg',
@@ -238,9 +251,6 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
         `with ${imagePrompt}, high quality, photorealistic, clean layout"`;
         
       toast.info(improvedPrompt, { duration: 8000 });
-    } catch (error) {
-      console.error('Error generating image:', error);
-      toast.error("Failed to generate image. Please try again with a different prompt.");
     } finally {
       setIsGeneratingImage(false);
     }
