@@ -9,6 +9,9 @@ import {
   SheetContent,
   SheetTrigger,
   SheetClose,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
 } from '@/components/ui/sheet';
 import {
   DropdownMenu,
@@ -94,11 +97,11 @@ export const Header = () => {
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[80vw] sm:w-[350px] bg-white pt-10">
-              <SheetClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2">
-                <X className="h-6 w-6" />
-                <span className="sr-only">Close</span>
-              </SheetClose>
+            <SheetContent side="right" className="w-[80vw] sm:w-[350px] bg-white">
+              <SheetHeader className="mb-5">
+                <SheetTitle>FlierHustle Menu</SheetTitle>
+                <SheetDescription>Navigate our services and features</SheetDescription>
+              </SheetHeader>
               <div className="flex flex-col space-y-4 py-4">
                 <NavLinks mobile onLinkClick={closeSheet} />
                 
