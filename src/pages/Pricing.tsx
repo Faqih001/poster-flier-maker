@@ -1,191 +1,189 @@
-
 import React from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { CheckCircle, X } from 'lucide-react';
+
+const plans = [
+	{
+		name: 'Basic',
+		price: 'KES 50',
+		priceDetail: 'per poster',
+		description: 'Perfect for occasional use and one-time projects',
+		features: [
+			'1 Poster Design at a time',
+			'High-resolution Downloads',
+			'Commercial Usage License',
+			'Basic Templates Access',
+			'24-hour Support',
+		],
+		limitations: ['No AI text generation', 'Standard templates only'],
+		cta: 'Get Started',
+		popular: false,
+		icon: '🏆',
+		color: 'from-blue-600 to-cyan-600',
+	},
+	{
+		name: 'Unlimited',
+		price: 'KES 399',
+		priceDetail: '/month',
+		description: 'Best value for small businesses and regular marketers',
+		features: [
+			'Unlimited Poster Designs',
+			'All Premium Templates',
+			'AI Text Generator',
+			'Priority Customer Support',
+			'Custom Branding Options',
+			'Social Media Integration',
+			'Design History & Recovery',
+		],
+		cta: 'Choose This Plan',
+		popular: true,
+		icon: '⭐',
+		color: 'from-purple-600 to-blue-600',
+	},
+	{
+		name: 'Print & Delivery',
+		price: 'KES 200',
+		priceDetail: 'per print',
+		description: 'Professional printing service add-on for physical marketing',
+		features: [
+			'Multiple Size Options (A4, A3, A2)',
+			'Premium Paper Quality',
+			'Fast Delivery Within Africa',
+			'Bulk Order Discounts (10%+)',
+			'Quality Assurance',
+			'High-gloss or Matte Finish',
+		],
+		cta: 'Learn More',
+		popular: false,
+		icon: '🚚',
+		color: 'from-green-600 to-teal-600',
+	},
+];
 
 const Pricing = () => {
-  const navigate = useNavigate();
-
-  return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-16">
-          <div className="text-center mb-16">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              Simple, Transparent Pricing
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Choose the plan that works best for your business. No hidden fees, cancel anytime.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-            {/* Pay Per Poster */}
-            <Card className="border-2 hover:shadow-lg transition-shadow">
-              <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl font-bold mb-4">Pay Per Poster</CardTitle>
-                <div className="text-5xl font-bold text-purple-600 mb-2">KES 50</div>
-                <p className="text-gray-600">Perfect for occasional use</p>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>1 Poster Design</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>High-res Download (PNG, PDF)</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>Commercial License</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>Basic Templates</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>Email Support</span>
-                  </li>
-                </ul>
-                <Button 
-                  className="w-full" 
-                  variant="outline"
-                  onClick={() => navigate('/create')}
-                >
-                  Get Started
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Unlimited Plan */}
-            <Card className="border-2 border-purple-500 relative hover:shadow-lg transition-shadow">
-              <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-purple-500 text-white px-4 py-1">
-                Most Popular
-              </Badge>
-              <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl font-bold mb-4">Unlimited Plan</CardTitle>
-                <div className="text-5xl font-bold text-purple-600 mb-2">
-                  KES 399
-                  <span className="text-lg text-gray-500">/month</span>
-                </div>
-                <p className="text-gray-600">Best for small businesses</p>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span className="font-medium">Unlimited Posters</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>AI Text Generator</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>Premium Templates</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>Custom Branding</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>Priority Support</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>Team Collaboration</span>
-                  </li>
-                </ul>
-                <Button 
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                  onClick={() => navigate('/auth')}
-                >
-                  Choose Plan
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Print Service */}
-            <Card className="border-2 hover:shadow-lg transition-shadow">
-              <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl font-bold mb-4">Print & Delivery</CardTitle>
-                <div className="text-3xl font-bold text-purple-600 mb-2">Add-on Service</div>
-                <p className="text-gray-600">Professional printing</p>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>A4 Size - KES 150</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>A3 Size - KES 300</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>A2 Size - KES 600</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>High-quality Paper</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>Fast Delivery (2-3 days)</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                    <span>Bulk Discounts Available</span>
-                  </li>
-                </ul>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => navigate('/order-prints')}
-                >
-                  Order Prints
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Payment Methods */}
-          <div className="text-center">
-            <h3 className="text-2xl font-bold mb-6">Accepted Payment Methods</h3>
-            <div className="flex justify-center items-center space-x-8 text-gray-600">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-2xl">📱</span>
-                </div>
-                <p className="font-medium">M-Pesa</p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-2xl">💳</span>
-                </div>
-                <p className="font-medium">Credit Card</p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-2xl">🏦</span>
-                </div>
-                <p className="font-medium">PayPal</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Layout>
-  );
+	return (
+		<Layout>
+			<div className="bg-gradient-to-b from-white to-purple-50 py-20 min-h-screen">
+				<div className="container mx-auto px-4">
+					<div className="text-center mb-16">
+						<Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-2 mb-6 text-sm font-medium">
+							💰 Affordable Pricing
+						</Badge>
+						<h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+							Simple Pricing
+						</h2>
+						<p className="text-xl text-gray-600 max-w-3xl mx-auto">
+							Choose the plan that fits your hustle - whether you're just starting
+							out or running a growing business
+						</p>
+					</div>
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+						{plans.map((plan, index) => (
+							<Card
+								key={index}
+								className={`relative overflow-hidden transition-all duration-300 hover:scale-105 ${
+									plan.popular
+										? 'border-2 border-purple-500 shadow-xl'
+										: 'border border-gray-200 hover:border-purple-300'
+								}`}
+							>
+								{plan.popular && (
+									<Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-1 shadow-md z-10">
+										Most Popular
+									</Badge>
+								)}
+								<div
+									className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${plan.color}`}
+								></div>
+								<CardContent className="p-8 text-center relative">
+									<div className="text-3xl mb-4">{plan.icon}</div>
+									<h3 className="text-2xl font-bold text-gray-900 mb-2">
+										{plan.name}
+									</h3>
+									<div className="flex items-center justify-center mb-1">
+										<span className="text-4xl font-bold bg-gradient-to-r from-purple-700 to-blue-700 bg-clip-text text-transparent">
+											{plan.price}
+										</span>
+										{plan.priceDetail && (
+											<span className="text-gray-600 font-medium ml-1">
+												{plan.priceDetail}
+											</span>
+										)}
+									</div>
+									<p className="text-gray-700 mb-6 font-medium">
+										{plan.description}
+									</p>
+									<div className="bg-gray-50 rounded-lg p-4 mb-6">
+										<p className="font-semibold text-gray-700 mb-2 text-left">
+											Includes:
+										</p>
+										<ul className="space-y-3 text-sm text-left">
+											{plan.features.map((feature, featureIndex) => (
+												<li
+													key={featureIndex}
+													className="flex items-center space-x-2"
+												>
+													<CheckCircle className="w-5 h-5 flex-shrink-0 text-green-500" />
+													<span className="text-gray-800">{feature}</span>
+												</li>
+											))}
+										</ul>
+										{plan.limitations && (
+											<div className="mt-4 pt-4 border-t border-gray-200">
+												<p className="font-medium text-gray-600 mb-2 text-left">
+													Limitations:
+												</p>
+												<ul className="space-y-2 text-sm text-left">
+													{plan.limitations.map((limitation, idx) => (
+														<li
+															key={idx}
+															className="flex items-center space-x-2 text-gray-500"
+														>
+															<X className="w-4 h-4 flex-shrink-0" />
+															<span>{limitation}</span>
+														</li>
+													))}
+												</ul>
+											</div>
+										)}
+									</div>
+									<Button
+										className={`w-full ${
+											plan.popular
+												? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg'
+												: 'bg-gray-800 hover:bg-gray-900'
+										} text-white text-lg py-6 font-medium transition-all duration-300`}
+									>
+										{plan.cta}
+									</Button>
+									{plan.popular && (
+										<p className="mt-3 text-sm text-purple-600 font-medium">
+											30-day money-back guarantee
+										</p>
+									)}
+								</CardContent>
+							</Card>
+						))}
+					</div>
+					<div className="text-center mt-16 bg-gray-50 py-8 px-6 rounded-xl max-w-3xl mx-auto border border-gray-200">
+						<h3 className="text-xl font-bold text-gray-800 mb-2">
+							Need a custom plan for your business?
+						</h3>
+						<p className="text-gray-600 mb-4">
+							Contact our team for enterprise solutions and custom pricing
+							packages.
+						</p>
+						<Button className="border-2 border-purple-500 text-purple-700 hover:bg-purple-50">
+							Contact Sales
+						</Button>
+					</div>
+				</div>
+			</div>
+		</Layout>
+	);
 };
 
 export default Pricing;
