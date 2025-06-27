@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "resolveJsonModule": true,
+    "lib": ["deno.window"]
+  },
+  "include": ["./**/*.ts", "./**/*.js", "./deno.d.ts"]
+}
