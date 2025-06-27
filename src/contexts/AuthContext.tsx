@@ -26,7 +26,8 @@ function useAuthHook() {
 // Export the hook consistently
 export const useAuth = useAuthHook;
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Using a named function component for better compatibility with Fast Refresh
+function AuthProviderComponent({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -93,4 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </AuthContext.Provider>
   );
-};
+}
+
+// Export the component consistently
+export const AuthProvider = AuthProviderComponent;

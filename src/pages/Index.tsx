@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Zap, Download, Printer, Sparkles, Clock, Star, ArrowRight, Users, Globe, Palette, Rocket, Layout as LayoutIcon, Bot, Edit, FileDown, Wand2, Layers, Smartphone } from 'lucide-react';
+import { CheckCircle, X, Zap, Download, Printer, Sparkles, Clock, Star, ArrowRight, Users, Globe, Palette, Rocket, Layout as LayoutIcon, Bot, Edit, FileDown, Wand2, Layers, Smartphone } from 'lucide-react';
 
 const Index = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
