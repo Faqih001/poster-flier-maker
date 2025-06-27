@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ModelClient from "@azure-rest/ai-inference";
 import { AzureKeyCredential } from "@azure/core-auth";
+import axios from 'axios';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -19,6 +20,11 @@ const AZURE_API_KEY = import.meta.env.VITE_AZURE_API_KEY;
 const AZURE_ENDPOINT = import.meta.env.VITE_AZURE_ENDPOINT;
 const AZURE_DEPLOYMENT = import.meta.env.VITE_AZURE_DEPLOYMENT || "grok-3";
 const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL;
+
+// DALL-E image generation configuration
+const AZURE_DALLE_ENDPOINT = import.meta.env.VITE_AZURE_DALLE_ENDPOINT || 
+  (AZURE_ENDPOINT ? `${AZURE_ENDPOINT}/openai/deployments/dall-e-3/images/generations?api-version=2024-02-01` : '');
+const AZURE_DALLE_API_KEY = import.meta.env.VITE_AZURE_DALLE_API_KEY || AZURE_API_KEY;
 
 // For development, log if environment variables are missing
 if (import.meta.env.DEV) {
