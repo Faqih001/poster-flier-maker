@@ -194,13 +194,30 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
       const response = await result.response;
       const text = response.text();
       
-      // Since we couldn't generate an image directly, let's show a placeholder or sample image
-      // Display an appropriate message to the user
-      toast.error("Image generation failed. Please try a different prompt or try again later.");
+      // Since direct image generation failed, let's try to use a relevant placeholder
+      // based on the template type
+      const placeholderImages = {
+        'Business': '/placeholders/business.jpg',
+        'Event': '/placeholders/event.jpg',
+        'Sale': '/placeholders/sale.jpg',
+        'Promotion': '/placeholders/promotion.jpg',
+        'default': '/placeholder.svg'
+      };
       
-      // We could set a placeholder image here if needed
-      // For now, we'll leave the image area empty so the user knows to try again
-      // This approach is cleaner than showing a potentially unrelated image
+      // Get a placeholder image that matches the template name or use default
+      const placeholderImage = placeholderImages[template.name] || placeholderImages.default;
+      
+      // Set the placeholder and inform the user
+      setGeneratedImage(placeholderImage);
+      toast.warning("Using a template image. You can try again with a different prompt.");
+      
+      // Suggest an improved prompt to the user based on their initial request
+      // This gives them actionable feedback for their next attempt
+      const improvedPrompt = 
+        `Try using a more descriptive prompt such as: "Professional ${template.name.toLowerCase()} poster ` + 
+        `with ${imagePrompt}, high quality, photorealistic, clean layout"`;
+        
+      toast.info(improvedPrompt, { duration: 8000 });
     } catch (error) {
       console.error('Error generating image:', error);
       toast.error("Failed to generate image. Please try again with a different prompt.");
