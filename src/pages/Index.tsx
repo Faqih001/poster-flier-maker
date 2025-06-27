@@ -313,7 +313,7 @@ const Index = () => {
                 },
                 {
                   name: "Print & Delivery",
-                  price: "From KES 200",
+                  price: "KES 200",
                   priceDetail: "per print",
                   description: "Professional printing service add-on for physical marketing",
                   features: [
