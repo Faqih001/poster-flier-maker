@@ -77,10 +77,10 @@ export const Header = () => {
     <header className="bg-white/95 backdrop-blur-xl border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-2 group">
-          <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-            <span className="text-white font-bold text-lg">F</span>
+          <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <span className="text-white font-bold text-base sm:text-lg">F</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors duration-300">FlierHustle</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors duration-300">FlierHustle</h1>
         </Link>
         
         {/* Desktop Navigation */}

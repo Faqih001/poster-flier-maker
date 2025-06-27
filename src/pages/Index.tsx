@@ -79,14 +79,14 @@ const Index = () => {
               <Badge className="bg-gradient-to-r from-purple-400 to-pink-400 text-white text-xs">NEW</Badge>
             </div>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
+            <h1 className="hero-heading text-white mb-6 md:mb-8">
               Design Posters in 
               <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent"> Seconds</span>
               <br />
-              <span className="text-3xl md:text-5xl lg:text-6xl">No Designer Needed</span>
+              <span className="hero-subheading block mt-2 md:mt-4">No Designer Needed</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto mb-10 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 md:mb-10 leading-relaxed">
               An AI-powered poster & flier maker for small businesses and hustlers. 
               <span className="text-purple-300 font-semibold"> Fast. Affordable. Professional.</span>
             </p>
