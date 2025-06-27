@@ -55,7 +55,8 @@ User question: ${message}
 
 Please provide a helpful, friendly, and concise response about poster creation, design tips, business marketing, or FlierHustle features. Keep responses under 200 words and always be encouraging about their business success.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${geminiApiKey}`, {
+    // Use the latest Gemini API version and model
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${geminiApiKey}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

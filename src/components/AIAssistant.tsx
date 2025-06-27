@@ -14,8 +14,10 @@ interface Message {
 
 // Initialize the Google Generative AI
 // Using Vite's import.meta.env to access environment variables in browser
-// For production, make sure to add VITE_GEMINI_API_KEY to your .env file
+// For production, make sure to add these to your .env file
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDEFsF9visXbuZfNEvtPvC8wI_deQBH-ro";
+// Configure the Supabase function URL - this allows easy switching between local and production endpoints
+const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL || "https://tkjffcghupvvwlzwyksr.supabase.co/functions/v1/ai-assistant";
 
 export const AIAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,7 +55,8 @@ export const AIAssistant = () => {
     try {
       // First try using the Supabase function (primary approach)
       try {
-        const response = await fetch('/functions/v1/ai-assistant', {
+        console.log(`Calling Supabase function at: ${SUPABASE_FUNCTION_URL}`);
+        const response = await fetch(SUPABASE_FUNCTION_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -85,8 +88,10 @@ export const AIAssistant = () => {
       
       // Fallback to client-side Gemini if API key is available
       if (API_KEY) {
+        // Initialize the Google AI with the correct API version
         const genAI = new GoogleGenerativeAI(API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        // Use the correct model name - ensure v1 is used, not v1beta
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
         
         // Prepare conversation history
         const chatHistory = messages
@@ -147,13 +152,13 @@ export const AIAssistant = () => {
     <>
       {/* AI Assistant Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-28 right-6 z-50 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 animate-scale-in">
+        <div className="fixed bottom-20 sm:bottom-28 right-3 sm:right-6 z-50 w-[calc(100%-24px)] sm:w-[450px] md:w-[500px] h-[60vh] sm:h-[500px] max-h-[600px] bg-white rounded-2xl shadow-2xl border border-gray-200 animate-scale-in">
           <Card className="h-full flex flex-col border-0 shadow-none">
-            <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-2xl p-4">
+            <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-2xl p-3 sm:p-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg flex items-center gap-2">
+                <CardTitle className="text-base sm:text-lg flex items-center gap-2">
                   <div className="bg-white rounded-full p-1">
-                    <Bot className="w-5 h-5 text-purple-600" />
+                    <Bot className="w-4 sm:w-5 h-4 sm:h-5 text-purple-600" />
                   </div>
                   AI Assistant
                 </CardTitle>
@@ -171,51 +176,51 @@ export const AIAssistant = () => {
             <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
               {/* Messages */}
               <div 
-                className="flex-1 p-4 space-y-4 overflow-y-auto"
-                style={{ maxHeight: "calc(100% - 70px)" }}
+                className="flex-1 p-3 sm:p-4 space-y-3 sm:space-y-4 overflow-y-auto"
+                style={{ maxHeight: "calc(100% - 60px)" }}
               >
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`flex items-end gap-2 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                    className={`flex items-end gap-1.5 sm:gap-2 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                   >
                     {/* Avatar */}
-                    <div className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${
+                    <div className={`flex-shrink-0 h-6 w-6 sm:h-8 sm:w-8 rounded-full flex items-center justify-center ${
                       message.role === 'user' 
                         ? 'bg-gradient-to-r from-purple-600 to-blue-600' 
                         : 'bg-gray-200'
                     }`}>
                       {message.role === 'user' ? (
-                        <div className="text-xs text-white font-bold">You</div>
+                        <div className="text-[10px] sm:text-xs text-white font-bold">You</div>
                       ) : (
-                        <Bot className="w-4 h-4 text-purple-600" />
+                        <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600" />
                       )}
                     </div>
                     
                     {/* Message bubble */}
                     <div
-                      className={`max-w-[75%] p-3 rounded-2xl ${
+                      className={`max-w-[78%] sm:max-w-[75%] p-2 sm:p-3 rounded-2xl text-sm ${
                         message.role === 'user'
                           ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
                           : 'bg-gray-100 text-gray-900'
                       }`}
                     >
-                      <p className="text-sm">{message.content}</p>
-                      <p className="text-[10px] opacity-70 mt-1 text-right">
+                      <p className="text-xs sm:text-sm">{message.content}</p>
+                      <p className="text-[8px] sm:text-[10px] opacity-70 mt-1 text-right">
                         {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                   </div>
                 ))}
                 {isLoading && (
-                  <div className="flex items-end gap-2">
-                    <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                      <Bot className="w-4 h-4 text-purple-600" />
+                  <div className="flex items-end gap-1.5 sm:gap-2">
+                    <div className="flex-shrink-0 h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                      <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600" />
                     </div>
-                    <div className="bg-gray-100 p-3 rounded-2xl flex items-center gap-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                    <div className="bg-gray-100 p-2 sm:p-3 rounded-2xl flex items-center gap-1">
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
                     </div>
                   </div>
                 )}
@@ -223,23 +228,23 @@ export const AIAssistant = () => {
               </div>
               
               {/* Input */}
-              <div className="p-4 border-t border-gray-200">
+              <div className="p-3 sm:p-4 border-t border-gray-200">
                 <div className="flex gap-2">
                   <Input
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Ask me about poster creation..."
-                    className="flex-1"
+                    className="flex-1 text-xs sm:text-sm h-9 sm:h-10"
                     disabled={isLoading}
                   />
                   <Button
                     onClick={sendMessage}
                     disabled={!inputMessage.trim() || isLoading}
                     size="icon"
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-full h-10 w-10 flex-shrink-0"
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-full h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </Button>
                 </div>
               </div>
@@ -251,16 +256,16 @@ export const AIAssistant = () => {
       {/* AI Assistant Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-24 right-6 z-50 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white p-4 rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 hover:scale-110 group"
+        className="fixed bottom-16 sm:bottom-24 right-3 sm:right-6 z-50 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white p-3 sm:p-4 rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 hover:scale-110 group"
         aria-label="Open AI Assistant"
       >
-        <Bot className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
+        <Bot className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform duration-300" />
         
         {/* Pulse effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full animate-ping opacity-20"></div>
         
-        {/* Tooltip */}
-        <div className="absolute bottom-full right-0 mb-2 bg-gray-900 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+        {/* Tooltip - only show on devices that can hover */}
+        <div className="absolute bottom-full right-0 mb-2 bg-gray-900 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden sm:block">
           AI Assistant
           <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
         </div>
