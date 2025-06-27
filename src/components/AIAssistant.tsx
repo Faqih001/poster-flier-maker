@@ -13,13 +13,11 @@ interface Message {
   timestamp: Date;
 }
 
-// Initialize the Azure AI and Supabase URL from .env file
+// Initialize the Azure AI configuration from .env file
 // Accessing environment variables with Vite's import.meta.env
 const AZURE_API_KEY = import.meta.env.VITE_AZURE_API_KEY;
 const AZURE_ENDPOINT = import.meta.env.VITE_AZURE_ENDPOINT;
 const AZURE_DEPLOYMENT = import.meta.env.VITE_AZURE_DEPLOYMENT || "grok-3"; // Default to grok-3 for text generation
-const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // DALL-E image generation configuration
 const AZURE_DALLE_DEPLOYMENT = import.meta.env.VITE_AZURE_DALLE_DEPLOYMENT || "dall-e-3"; // Default to dall-e-3 for image generation
@@ -27,26 +25,22 @@ const AZURE_DALLE_ENDPOINT = import.meta.env.VITE_AZURE_DALLE_ENDPOINT ||
   (AZURE_ENDPOINT ? `${AZURE_ENDPOINT}/openai/deployments/${AZURE_DALLE_DEPLOYMENT}/images/generations?api-version=2024-02-01` : '');
 const AZURE_DALLE_API_KEY = import.meta.env.VITE_AZURE_DALLE_API_KEY || AZURE_API_KEY; // Use the same API key if not specified separately
 
-// For development, log if environment variables are missing
+// For development, log if essential environment variables are missing
 if (import.meta.env.DEV) {
   const missingEnvVars = [];
   if (!AZURE_API_KEY) missingEnvVars.push("VITE_AZURE_API_KEY");
   if (!AZURE_ENDPOINT) missingEnvVars.push("VITE_AZURE_ENDPOINT");
   if (!AZURE_DEPLOYMENT) missingEnvVars.push("VITE_AZURE_DEPLOYMENT");
-  if (!SUPABASE_FUNCTION_URL) missingEnvVars.push("VITE_SUPABASE_FUNCTION_URL");
-  if (!SUPABASE_ANON_KEY) missingEnvVars.push("VITE_SUPABASE_ANON_KEY");
   
   if (missingEnvVars.length > 0) {
     console.warn(
-      "Missing environment variables. Make sure you've set up your .env file correctly:\n" +
+      "Missing Azure AI environment variables. Make sure you've set up your .env file correctly:\n" +
       "- VITE_AZURE_API_KEY: " + (AZURE_API_KEY ? "✓" : "✗") + "\n" +
       "- VITE_AZURE_ENDPOINT: " + (AZURE_ENDPOINT ? "✓" : "✗") + "\n" +
       "- VITE_AZURE_DEPLOYMENT: " + (AZURE_DEPLOYMENT ? "✓" : "✗") + " (should be grok-3)" + "\n" +
       "- VITE_AZURE_DALLE_DEPLOYMENT: " + (AZURE_DALLE_DEPLOYMENT ? "✓" : "✗") + " (should be dall-e-3)" + "\n" +
       "- VITE_AZURE_DALLE_ENDPOINT: " + (AZURE_DALLE_ENDPOINT ? "✓" : "✗") + "\n" +
-      "- VITE_SUPABASE_FUNCTION_URL: " + (SUPABASE_FUNCTION_URL ? "✓" : "✗") + "\n" +
-      "- VITE_SUPABASE_ANON_KEY: " + (SUPABASE_ANON_KEY ? "✓" : "✗") + "\n" +
-      "\nPlease check the .env.example file and create a proper .env file."
+      "\nPlease check your Azure API configuration in the .env file."
     );
   }
 }
@@ -91,58 +85,7 @@ export const AIAssistant = (): JSX.Element => {
                           inputMessage.toLowerCase().includes('design a poster');
 
     try {
-      // Check if Supabase function URL is valid
-      let isValidFunctionUrl = false;
-      
-      if (SUPABASE_FUNCTION_URL && 
-          SUPABASE_FUNCTION_URL !== 'your_supabase_function_url_here' &&
-          !SUPABASE_FUNCTION_URL.includes('your-project-ref.supabase.co')) {
-        // Verify URL is properly formatted
-        try {
-          new URL(SUPABASE_FUNCTION_URL);
-          isValidFunctionUrl = true;
-        } catch (e) {
-          console.error('Invalid Supabase function URL format:', SUPABASE_FUNCTION_URL);
-          isValidFunctionUrl = false;
-        }
-      }
-                                
-      // First try using the Supabase function (primary approach)
-      if (isValidFunctionUrl) {
-        try {
-          console.log(`Calling Supabase function at: ${SUPABASE_FUNCTION_URL}`);
-          const response = await fetch(SUPABASE_FUNCTION_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-            message: inputMessage,
-            context: 'FlierHustle poster creation assistant',
-            isImageRequest: isImageRequest
-          }),
-          // Set a reasonable timeout
-          signal: AbortSignal.timeout(8000)
-        });
-
-        if (!response.ok) throw new Error('Failed to get AI response');
-
-        const data = await response.json();
-        
-        const assistantMessage: Message = {
-          role: 'assistant',
-          content: data.response,
-          timestamp: new Date()
-        };
-
-        setMessages(prev => [...prev, assistantMessage]);
-        return; // Exit if Supabase function worked
-      } catch (supabaseError) {
-        console.warn('Supabase AI function failed, falling back to client-side AI:', supabaseError);
-        // Continue to fallback implementation
-      }
-      
-      // Fallback to client-side Azure AI if API key is available
+      // Only use client-side Azure AI if API key is available
       if (AZURE_API_KEY && AZURE_ENDPOINT) {
         try {
           // Create Azure AI client with API key authentication using AzureKeyCredential
@@ -239,14 +182,13 @@ Would you like me to help you with anything else about poster creation?`;
           throw new Error('Could not generate response with Azure AI');
         }
       } else {
-        throw new Error('AI service not available');
+        throw new Error('Azure AI service not available. Please check your API keys in the environment configuration.');
       }
-    } // <-- Add this closing brace to properly close the first try block
     } catch (error) {
       console.error('AI Assistant Error:', error);
       const errorMessage: Message = {
         role: 'assistant',
-        content: 'Sorry, I\'m having trouble right now. Please try again later or contact our support team.',
+        content: 'Sorry, I\'m having trouble connecting to the AI service. Please check that your Azure API keys are correctly configured.',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);

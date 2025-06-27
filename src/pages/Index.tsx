@@ -37,8 +37,6 @@ const Index = () => {
           <div className="relative mx-auto">
             {/* Animated spinner */}
             <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-l-4 border-r-4 border-b-transparent border-white mx-auto"></div>
-            {/* Inner glow */}
-            <div className="absolute inset-0 rounded-full bg-white/5 blur-md transform scale-90"></div>
           </div>
           <div className="mt-8 text-white text-xl font-medium">Loading your creative workspace...</div>
           <div className="mt-3 text-blue-200 text-sm">Preparing your design experience</div>
