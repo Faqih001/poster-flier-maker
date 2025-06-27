@@ -64,16 +64,25 @@ This project is built with:
 
 This project uses environment variables to manage API keys and sensitive information. Follow these steps to set up your environment:
 
-1. Create a `.env` file in the root directory (it's already included in `.gitignore` to prevent committing sensitive data)
+1. Create a `.env.local` file in the root directory (it's already included in `.gitignore` to prevent committing sensitive data)
 2. Copy the variables from `.env.example` and replace with your actual API keys:
 
 ```
-# For AI Assistant functionality (Google Gemini API)
+# For AI Assistant functionality in browser (Google Gemini API)
+VITE_GEMINI_API_KEY=your_actual_gemini_api_key
+
+# For AI Assistant functionality in Supabase Functions (Google Gemini API)
 GEMINI_API_KEY=your_actual_gemini_api_key
 
 # For email sending functionality (Resend API)
 RESEND_API_KEY=your_actual_resend_api_key
+
+# For authentication (if using NextAuth)
+NEXTAUTH_SECRET=your_generated_secret_here
+NEXTAUTH_URL=http://localhost:8080
 ```
+
+**Note**: For browser-side code, make sure to prefix your environment variables with `VITE_` to make them available to the client-side code.
 
 ### Important Security Notes:
 - Never commit your actual API keys to version control

@@ -13,9 +13,9 @@ interface Message {
 }
 
 // Initialize the Google Generative AI
-// Note: In real production, you would use environment variables
-// For demo purposes, using a placeholder that would be replaced with your actual key
-const API_KEY = process.env.GOOGLE_AI_API_KEY || "";
+// Using Vite's import.meta.env to access environment variables in browser
+// For production, make sure to add VITE_GEMINI_API_KEY to your .env file
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDEFsF9visXbuZfNEvtPvC8wI_deQBH-ro";
 
 export const AIAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
