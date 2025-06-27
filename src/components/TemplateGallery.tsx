@@ -72,6 +72,139 @@ const sampleTemplates: Template[] = [
     accentColor: '#E17055',
     layout: 'split',
     elements: []
+  },
+  // New templates
+  {
+    id: '7',
+    name: 'Hair Salon Discount',
+    category: 'Services',
+    previewImage: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=600',
+    backgroundColor: '#FF9A8B',
+    textColor: '#2D3436',
+    accentColor: '#6C5B7B',
+    layout: 'minimal',
+    elements: []
+  },
+  {
+    id: '8',
+    name: 'Music Concert',
+    category: 'Events',
+    previewImage: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=400&h=600',
+    backgroundColor: '#4B0082',
+    textColor: '#FFFFFF',
+    accentColor: '#FFD700',
+    layout: 'bold',
+    elements: []
+  },
+  {
+    id: '9',
+    name: 'Bakery Menu',
+    category: 'Food & Beverage',
+    previewImage: 'https://images.unsplash.com/photo-1495147466023-ac5c588e2e94?w=400&h=600',
+    backgroundColor: '#D4A373',
+    textColor: '#3A3238',
+    accentColor: '#FAEDCD',
+    layout: 'split',
+    elements: []
+  },
+  {
+    id: '10',
+    name: 'Tech Workshop',
+    category: 'Events',
+    previewImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=600',
+    backgroundColor: '#2A2A72',
+    textColor: '#FFFFFF',
+    accentColor: '#009FFD',
+    layout: 'hero',
+    elements: []
+  },
+  {
+    id: '11',
+    name: 'Fashion Sale',
+    category: 'Retail',
+    previewImage: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=600',
+    backgroundColor: '#F8F9FA',
+    textColor: '#212529',
+    accentColor: '#FF758F',
+    layout: 'minimal',
+    elements: []
+  },
+  {
+    id: '12',
+    name: 'Gym Membership',
+    category: 'Services',
+    previewImage: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=600',
+    backgroundColor: '#212529',
+    textColor: '#FFFFFF',
+    accentColor: '#FFC107',
+    layout: 'bold',
+    elements: []
+  },
+  {
+    id: '13',
+    name: 'Coffee Shop Promo',
+    category: 'Food & Beverage',
+    previewImage: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=600',
+    backgroundColor: '#6F4E37',
+    textColor: '#FFFFFF',
+    accentColor: '#F5DEB3',
+    layout: 'split',
+    elements: []
+  },
+  {
+    id: '14',
+    name: 'Business Conference',
+    category: 'Business',
+    previewImage: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=400&h=600',
+    backgroundColor: '#004E92',
+    textColor: '#FFFFFF',
+    accentColor: '#E9E9E9',
+    layout: 'hero',
+    elements: []
+  },
+  {
+    id: '15',
+    name: 'Electronics Sale',
+    category: 'Product',
+    previewImage: 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=400&h=600',
+    backgroundColor: '#151515',
+    textColor: '#FFFFFF',
+    accentColor: '#00F2EA',
+    layout: 'bold',
+    elements: []
+  },
+  {
+    id: '16',
+    name: 'Cooking Class',
+    category: 'Events',
+    previewImage: 'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&h=600',
+    backgroundColor: '#E76F51',
+    textColor: '#FFFFFF',
+    accentColor: '#F4A261',
+    layout: 'split',
+    elements: []
+  },
+  {
+    id: '17',
+    name: 'Car Wash Service',
+    category: 'Services',
+    previewImage: 'https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=400&h=600',
+    backgroundColor: '#3A86FF',
+    textColor: '#FFFFFF',
+    accentColor: '#FFBE0B',
+    layout: 'minimal',
+    elements: []
+  },
+  {
+    id: '18',
+    name: 'Real Estate Open House',
+    category: 'Business',
+    previewImage: 'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=400&h=600',
+    backgroundColor: '#023047',
+    textColor: '#FFFFFF',
+    accentColor: '#8ECAE6',
+    layout: 'hero',
+    elements: []
   }
 ];
 

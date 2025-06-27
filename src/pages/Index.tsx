@@ -344,7 +344,7 @@ const Index = () => {
             <TemplateGallery onTemplateSelect={handleTemplateSelect} />
             <div className="text-center mt-12">
               <Button
-                onClick={() => navigate('/templates')}
+                onClick={() => navigate('/templates-gallery')}
                 size="lg"
                 className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-10 py-6 rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 group"
               >
