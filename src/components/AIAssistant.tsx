@@ -40,7 +40,9 @@ if (import.meta.env.DEV) {
       "Missing environment variables. Make sure you've set up your .env file correctly:\n" +
       "- VITE_AZURE_API_KEY: " + (AZURE_API_KEY ? "✓" : "✗") + "\n" +
       "- VITE_AZURE_ENDPOINT: " + (AZURE_ENDPOINT ? "✓" : "✗") + "\n" +
-      "- VITE_AZURE_DEPLOYMENT: " + (AZURE_DEPLOYMENT ? "✓" : "✗") + "\n" +
+      "- VITE_AZURE_DEPLOYMENT: " + (AZURE_DEPLOYMENT ? "✓" : "✗") + " (should be grok-3)" + "\n" +
+      "- VITE_AZURE_DALLE_DEPLOYMENT: " + (AZURE_DALLE_DEPLOYMENT ? "✓" : "✗") + " (should be dall-e-3)" + "\n" +
+      "- VITE_AZURE_DALLE_ENDPOINT: " + (AZURE_DALLE_ENDPOINT ? "✓" : "✗") + "\n" +
       "- VITE_SUPABASE_FUNCTION_URL: " + (SUPABASE_FUNCTION_URL ? "✓" : "✗") + "\n" +
       "\nPlease check the .env.example file and create a proper .env file."
     );
