@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ModelClient from "@azure-rest/ai-inference";
+import { AzureKeyCredential } from "@azure/core-auth";
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -14,8 +15,8 @@ interface Message {
 
 // Initialize the Azure AI and Supabase URL from .env file
 // Accessing environment variables with Vite's import.meta.env
-const AZURE_API_KEY = import.meta.env.VITE_AZURE_API_KEY || "3uTQWVskUTQFsIJbZVt2PfQFlha9afMlLhTmzgXbYY6BNq79PU69JQQJ99BEACYeBjFXJ3w3AAAAACOGMM1w";
-const AZURE_ENDPOINT = import.meta.env.VITE_AZURE_ENDPOINT || "https://mybots254.services.ai.azure.com/models";
+const AZURE_API_KEY = import.meta.env.VITE_AZURE_API_KEY;
+const AZURE_ENDPOINT = import.meta.env.VITE_AZURE_ENDPOINT;
 const AZURE_DEPLOYMENT = import.meta.env.VITE_AZURE_DEPLOYMENT || "grok-3";
 const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL;
 
