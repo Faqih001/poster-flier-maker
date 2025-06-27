@@ -101,7 +101,7 @@ const Index = () => {
                 onClick={() => navigate('/pricing')}
                 variant="outline"
                 size="lg"
-                className="border-2 border-white/50 text-white hover:bg-white hover:text-purple-900 text-lg px-10 py-6 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 font-medium"
+                className="border-2 border-white/50 text-white bg-white/20 hover:bg-white hover:text-purple-900 text-lg px-10 py-6 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 font-medium"
               >
                 View Pricing
               </Button>
