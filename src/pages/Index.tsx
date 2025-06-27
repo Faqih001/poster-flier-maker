@@ -32,10 +32,18 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white mb-4"></div>
-          <div className="text-white text-xl font-medium">Loading your creative workspace...</div>
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center fixed inset-0">
+        <div className="text-center max-w-md mx-auto px-6">
+          <div className="relative mx-auto">
+            {/* Outer ring */}
+            <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
+            {/* Animated spinner */}
+            <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-l-4 border-r-4 border-b-transparent border-white mx-auto"></div>
+            {/* Inner glow */}
+            <div className="absolute inset-0 rounded-full bg-white/5 blur-md transform scale-90"></div>
+          </div>
+          <div className="mt-8 text-white text-xl font-medium">Loading your creative workspace...</div>
+          <div className="mt-3 text-blue-200 text-sm">Preparing your design experience</div>
         </div>
       </div>
     );
@@ -253,65 +261,147 @@ const Index = () => {
         </div>
 
         {/* Pricing Plans */}
-        <div className="bg-white py-20">
+        <div className="bg-gradient-to-b from-white to-purple-50 py-20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
+              <Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-2 mb-6 text-sm font-medium">
+                💰 Affordable Pricing
+              </Badge>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Simple Pricing</h2>
-              <p className="text-xl text-gray-600">Choose the plan that fits your hustle</p>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">Choose the plan that fits your hustle - whether you're just starting out or running a growing business</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {[
                 {
-                  name: "Per Poster",
+                  name: "Basic",
                   price: "KES 50",
-                  description: "Perfect for occasional use",
-                  features: ["1 Poster Design", "High-res Download", "Commercial License"],
-                  popular: false
+                  priceDetail: "per poster",
+                  description: "Perfect for occasional use and one-time projects",
+                  features: [
+                    "1 Poster Design at a time",
+                    "High-resolution Downloads",
+                    "Commercial Usage License",
+                    "Basic Templates Access",
+                    "24-hour Support"
+                  ],
+                  limitations: [
+                    "No AI text generation",
+                    "Standard templates only"
+                  ],
+                  cta: "Get Started",
+                  popular: false,
+                  icon: "🏆",
+                  color: "from-blue-600 to-cyan-600"
                 },
                 {
                   name: "Unlimited",
                   price: "KES 399",
-                  period: "/month",
-                  description: "Best for small businesses",
-                  features: ["Unlimited Posters", "AI Text Generator", "Priority Support", "Custom Branding"],
-                  popular: true
+                  priceDetail: "/month",
+                  description: "Best value for small businesses and regular marketers",
+                  features: [
+                    "Unlimited Poster Designs",
+                    "All Premium Templates",
+                    "AI Text Generator",
+                    "Priority Customer Support",
+                    "Custom Branding Options",
+                    "Social Media Integration",
+                    "Design History & Recovery"
+                  ],
+                  cta: "Choose This Plan",
+                  popular: true,
+                  icon: "⭐",
+                  color: "from-purple-600 to-blue-600"
                 },
                 {
                   name: "Print & Delivery",
-                  price: "Add-on",
-                  description: "Professional printing service",
-                  features: ["A4, A3, A2 Sizes", "High-quality Paper", "Fast Delivery", "Bulk Discounts"],
-                  popular: false
+                  price: "From KES 200",
+                  priceDetail: "per print",
+                  description: "Professional printing service add-on for physical marketing",
+                  features: [
+                    "Multiple Size Options (A4, A3, A2)",
+                    "Premium Paper Quality",
+                    "Fast Delivery Within Africa",
+                    "Bulk Order Discounts (10%+)",
+                    "Quality Assurance",
+                    "High-gloss or Matte Finish"
+                  ],
+                  cta: "Learn More",
+                  popular: false,
+                  icon: "🚚",
+                  color: "from-green-600 to-teal-600"
                 }
               ].map((plan, index) => (
-                <Card key={index} className={`relative overflow-hidden transition-all duration-300 hover:scale-105 ${plan.popular ? 'border-2 border-purple-500 shadow-xl' : 'border-2 border-gray-200 hover:border-purple-300'}`}>
+                <Card key={index} className={`relative overflow-hidden transition-all duration-300 hover:scale-105 ${
+                  plan.popular 
+                    ? 'border-2 border-purple-500 shadow-xl' 
+                    : 'border border-gray-200 hover:border-purple-300'
+                }`}>
                   {plan.popular && (
-                    <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-1">
+                    <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-1 shadow-md z-10">
                       Most Popular
                     </Badge>
                   )}
-                  <CardContent className="p-8 text-center">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">{plan.name}</h3>
-                    <div className="text-4xl font-bold text-purple-600 mb-2">
-                      {plan.price}
-                      {plan.period && <span className="text-lg text-gray-600">{plan.period}</span>}
+                  <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${plan.color}`}></div>
+                  <CardContent className="p-8 text-center relative">
+                    <div className="text-3xl mb-4">{plan.icon}</div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                    <div className="flex items-center justify-center mb-1">
+                      <span className="text-4xl font-bold bg-gradient-to-r from-purple-700 to-blue-700 bg-clip-text text-transparent">
+                        {plan.price}
+                      </span>
+                      {plan.priceDetail && <span className="text-gray-600 font-medium ml-1">{plan.priceDetail}</span>}
                     </div>
-                    <p className="text-gray-600 mb-6">{plan.description}</p>
-                    <ul className="space-y-3 text-sm text-gray-600 mb-8">
-                      {plan.features.map((feature, featureIndex) => (
-                        <li key={featureIndex} className="flex items-center justify-center space-x-2">
-                          <CheckCircle className="w-4 h-4 text-green-500" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button className={`w-full ${plan.popular ? 'bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600' : 'bg-gray-900 hover:bg-gray-800'} text-white transition-all duration-300`}>
-                      {plan.popular ? 'Choose Plan' : plan.name === 'Add-on' ? 'Learn More' : 'Get Started'}
+                    <p className="text-gray-700 mb-6 font-medium">{plan.description}</p>
+                    
+                    <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                      <p className="font-semibold text-gray-700 mb-2 text-left">Includes:</p>
+                      <ul className="space-y-3 text-sm text-left">
+                        {plan.features.map((feature, featureIndex) => (
+                          <li key={featureIndex} className="flex items-center space-x-2">
+                            <CheckCircle className="w-5 h-5 flex-shrink-0 text-green-500" />
+                            <span className="text-gray-800">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      {plan.limitations && (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                          <p className="font-medium text-gray-600 mb-2 text-left">Limitations:</p>
+                          <ul className="space-y-2 text-sm text-left">
+                            {plan.limitations.map((limitation, idx) => (
+                              <li key={idx} className="flex items-center space-x-2 text-gray-500">
+                                <X className="w-4 h-4 flex-shrink-0" />
+                                <span>{limitation}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <Button className={`w-full ${
+                      plan.popular 
+                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg' 
+                        : 'bg-gray-800 hover:bg-gray-900'
+                    } text-white text-lg py-6 font-medium transition-all duration-300`}>
+                      {plan.cta}
                     </Button>
+                    
+                    {plan.popular && (
+                      <p className="mt-3 text-sm text-purple-600 font-medium">30-day money-back guarantee</p>
+                    )}
                   </CardContent>
                 </Card>
               ))}
+            </div>
+            
+            <div className="text-center mt-16 bg-gray-50 py-8 px-6 rounded-xl max-w-3xl mx-auto border border-gray-200">
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Need a custom plan for your business?</h3>
+              <p className="text-gray-600 mb-4">Contact our team for enterprise solutions and custom pricing packages.</p>
+              <Button variant="outline" className="border-2 border-purple-500 text-purple-700 hover:bg-purple-50">
+                Contact Sales
+              </Button>
             </div>
           </div>
         </div>

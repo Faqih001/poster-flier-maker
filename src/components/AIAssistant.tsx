@@ -12,12 +12,19 @@ interface Message {
   timestamp: Date;
 }
 
-// Initialize the Google Generative AI
-// Using Vite's import.meta.env to access environment variables in browser
-// For production, make sure to add these to your .env file
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDEFsF9visXbuZfNEvtPvC8wI_deQBH-ro";
-// Configure the Supabase function URL - this allows easy switching between local and production endpoints
-const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL || "https://tkjffcghupvvwlzwyksr.supabase.co/functions/v1/ai-assistant";
+// Initialize the Google Generative AI and Supabase URL from .env file
+// Accessing environment variables with Vite's import.meta.env
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL;
+
+// For development, log if environment variables are missing
+if (import.meta.env.DEV && (!API_KEY || !SUPABASE_FUNCTION_URL)) {
+  console.warn(
+    "Missing environment variables. Make sure you've set up your .env file correctly:\n" +
+    "- VITE_GEMINI_API_KEY: " + (API_KEY ? "✓" : "✗") + "\n" +
+    "- VITE_SUPABASE_FUNCTION_URL: " + (SUPABASE_FUNCTION_URL ? "✓" : "✗")
+  );
+}
 
 export const AIAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
