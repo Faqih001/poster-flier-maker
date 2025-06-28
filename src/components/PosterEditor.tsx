@@ -46,6 +46,12 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
   const [imagePrompt, setImagePrompt] = useState('');
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [designTitle, setDesignTitle] = useState('My Poster Design');
+  const [themeColor, setThemeColor] = useState('#1E3A8A'); // Default to a shade of blue
+
+  // Store uploaded images/logos in state
+  const [backgroundImages, setBackgroundImages] = useState<(string | null)[]>([null, null]);
+  const [mainLogo, setMainLogo] = useState<string | null>(null);
+  const [sponsorLogos, setSponsorLogos] = useState<{sponsor1: string | null, sponsor2: string | null}>({sponsor1: null, sponsor2: null});
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -297,6 +303,78 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
     toast.success("Poster exported successfully!");
   };
 
+  // Update handlers to store images as data URLs
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const url = e.target?.result as string;
+      setBackgroundImages(prev => {
+        const arr = [...prev];
+        arr[index] = url;
+        return arr;
+      });
+      toast.success(`Background image ${index + 1} uploaded!`);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>, type: 'main' | 'sponsor1' | 'sponsor2') => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const url = e.target?.result as string;
+      if (type === 'main') setMainLogo(url);
+      else setSponsorLogos(prev => ({ ...prev, [type]: url }));
+      toast.success(`${type === 'main' ? 'Main logo' : 'Sponsored logo'} uploaded!`);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Enhanced image prompt for AI generation
+  useEffect(() => {
+    // Only update if any of the poster details or images change
+    const details = [posterText.headline, posterText.subheading, posterText.description, posterText.cta].join(' ');
+    let prompt = `Design a professional event poster with the following details: 
+` +
+      `Headline: ${posterText.headline}\n` +
+      `Subheading: ${posterText.subheading}\n` +
+      `Description: ${posterText.description}\n` +
+      `Call to Action: ${posterText.cta}\n` +
+      `Theme colors: sky blue, white, cream.\n`;
+    if (backgroundImages[0] || backgroundImages[1]) {
+      prompt += `Incorporate two background images provided by the user. `;
+    }
+    if (mainLogo) {
+      prompt += `Include the main logo at the top. `;
+    }
+    if (sponsorLogos.sponsor1 || sponsorLogos.sponsor2) {
+      prompt += `Place sponsored logos at the bottom. `;
+    }
+    setImagePrompt(prompt);
+    // eslint-disable-next-line
+  }, [posterText, backgroundImages, mainLogo, sponsorLogos, themeColor]);
+
+  // Add a new preset for the poster editor to support event posters with background images, main logo, sponsored logos, and custom text/colors
+
+  // Example usage in PosterEditor or TemplateGallery:
+  // When user selects "Event Poster" or uploads images, prompt for:
+  // - 2 background images
+  // - 1 main logo
+  // - 2 sponsored logos (bottom)
+  // - Main event text (title, description, services, venue, date, theme colors)
+  //
+  // The editor should:
+  // - Allow drag-and-drop or upload for each image/logo slot
+  // - Place the main event text in a visually appealing layout
+  // - Use theme colors (sky blue, white, cream) for backgrounds, overlays, and text
+  // - Place sponsored logos at the bottom
+  // - Allow user to adjust text, images, and colors before download
+  //
+  // This can be implemented as a new template or as a guided creation flow in PosterEditor.
+
   if (!user) {
     return null; // Will redirect via useEffect
   }
@@ -485,6 +563,43 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
                 </div>
               </CardContent>
             </Card>
+
+            {/* NEW: Event Poster Inputs */}
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Image className="w-5 h-5 mr-2" />
+                  Event Poster Assets
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-white text-sm font-medium mb-2 block">Background Photo 1</label>
+                  <Input type="file" accept="image/*" onChange={e => handleImageUpload(e, 0)} className="bg-white/10 border-white/20 text-white" />
+                </div>
+                <div>
+                  <label className="text-white text-sm font-medium mb-2 block">Background Photo 2</label>
+                  <Input type="file" accept="image/*" onChange={e => handleImageUpload(e, 1)} className="bg-white/10 border-white/20 text-white" />
+                </div>
+                <div>
+                  <label className="text-white text-sm font-medium mb-2 block">Main Logo</label>
+                  <Input type="file" accept="image/*" onChange={e => handleLogoUpload(e, 'main')} className="bg-white/10 border-white/20 text-white" />
+                </div>
+                <div>
+                  <label className="text-white text-sm font-medium mb-2 block">Sponsored Logo 1 (Bottom)</label>
+                  <Input type="file" accept="image/*" onChange={e => handleLogoUpload(e, 'sponsor1')} className="bg-white/10 border-white/20 text-white" />
+                </div>
+                <div>
+                  <label className="text-white text-sm font-medium mb-2 block">Sponsored Logo 2 (Bottom)</label>
+                  <Input type="file" accept="image/*" onChange={e => handleLogoUpload(e, 'sponsor2')} className="bg-white/10 border-white/20 text-white" />
+                </div>
+                <div>
+                  <label className="text-white text-sm font-medium mb-2 block">Theme Color</label>
+                  <input type="color" value={themeColor} onChange={e => setThemeColor(e.target.value)} className="w-12 h-8 border-2 border-white/30 rounded" />
+                  <span className="ml-3 text-white text-xs">Sky Blue, White, Cream recommended</span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Preview Panel */}
@@ -495,34 +610,36 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
                      style={{ backgroundColor: template.backgroundColor }}>
                   <div className="h-full p-6 flex flex-col justify-between text-center relative"
                        style={{ color: template.textColor }}>
-                    
-                    {/* Background Image */}
-                    {generatedImage && (
-                      <div 
-                        className="absolute inset-0 bg-cover bg-center opacity-20"
-                        style={{ backgroundImage: `url(${generatedImage})` }}
-                      ></div>
+                    {/* Background Images */}
+                    {backgroundImages[0] && (
+                      <img src={backgroundImages[0]} alt="Background 1" className="absolute inset-0 w-full h-full object-cover opacity-30 z-0" />
                     )}
-                    
-                    <div className="space-y-4 relative z-10">
+                    {backgroundImages[1] && (
+                      <img src={backgroundImages[1]} alt="Background 2" className="absolute inset-0 w-full h-full object-cover opacity-20 z-0" />
+                    )}
+                    {/* AI Generated Image (below user images) */}
+                    {generatedImage && (
+                      <img src={generatedImage} alt="AI Generated" className="absolute inset-0 w-full h-full object-cover opacity-15 z-0" />
+                    )}
+                    {/* Main Logo */}
+                    {mainLogo && (
+                      <img src={mainLogo} alt="Main Logo" className="absolute top-6 left-1/2 -translate-x-1/2 w-24 h-24 object-contain z-10" />
+                    )}
+                    <div className="space-y-4 relative z-20 pt-32">
                       <h1 className="text-3xl font-bold leading-tight">
                         {posterText.headline}
                       </h1>
-                      
                       <div className="w-16 h-1 mx-auto rounded-full"
                            style={{ backgroundColor: template.accentColor }}>
                       </div>
-                      
                       <h2 className="text-xl font-semibold">
                         {posterText.subheading}
                       </h2>
                     </div>
-
-                    <div className="space-y-4 relative z-10">
+                    <div className="space-y-4 relative z-20">
                       <p className="text-lg leading-relaxed">
                         {posterText.description}
                       </p>
-                      
                       <div className="px-4 py-3 rounded-lg font-bold text-lg"
                            style={{ 
                              backgroundColor: template.accentColor,
@@ -530,6 +647,15 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
                            }}>
                         {posterText.cta}
                       </div>
+                    </div>
+                    {/* Sponsored Logos at the bottom */}
+                    <div className="absolute bottom-6 left-0 w-full flex justify-center gap-8 z-20">
+                      {sponsorLogos.sponsor1 && (
+                        <img src={sponsorLogos.sponsor1} alt="Sponsor 1" className="w-20 h-12 object-contain" />
+                      )}
+                      {sponsorLogos.sponsor2 && (
+                        <img src={sponsorLogos.sponsor2} alt="Sponsor 2" className="w-20 h-12 object-contain" />
+                      )}
                     </div>
                   </div>
                 </div>
