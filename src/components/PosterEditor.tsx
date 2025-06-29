@@ -159,66 +159,20 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
     }
   };
 
+  // Fix: fallback to Supabase function if Azure DALL-E returns 401/403/invalid key
   const generateAIImage = async () => {
     if (!imagePrompt.trim()) {
-      toast.error("Please enter an image prompt");
+      toast.error("Poster details are required for image generation");
       return;
     }
-
     setIsGeneratingImage(true);
     try {
-      // Check for Azure DALL-E API configuration
-      if (!AZURE_DALLE_API_KEY || !AZURE_DALLE_ENDPOINT) {
-        throw new Error("Azure DALL-E API key or endpoint is missing. Please check your environment variables.");
-      }
-      
-      // Construct a prompt that will work well with the poster design
-      const enhancedPrompt = 
-        `Create a professional poster image for: ${imagePrompt}. ` +
-        `Make it suitable for a ${template.name} poster, with clean design, ` +
-        `high visual appeal, and appropriate for business use. ` +
-        `The image should be visually striking and have a professional look.`;
-      
-      // Check if we can use Supabase functions (they might be unavailable due to missing config)
-      const canUseSupabase = import.meta.env.VITE_SUPABASE_URL && 
-                           import.meta.env.VITE_SUPABASE_URL !== 'your_supabase_url_here' &&
-                           import.meta.env.VITE_SUPABASE_ANON_KEY && 
-                           import.meta.env.VITE_SUPABASE_ANON_KEY !== 'your_supabase_anon_key_here';
-      
-      // First try using the Supabase function as it might be optimized for our use case
-      if (canUseSupabase) {
-        try {
-          toast.info("Generating image via Supabase function...");
-          const { data, error } = await supabase.functions.invoke('generate-image', {
-            body: { 
-              prompt: enhancedPrompt,
-              templateStyle: template.name
-            }
-          });
-          
-          if (!error && data && data.imageUrl) {
-            setGeneratedImage(data.imageUrl);
-            toast.success("Image generated successfully via Supabase function!");
-            return;
-          } else if (error) {
-            console.warn('Supabase function error:', error);
-          }
-        } catch (supabaseError) {
-          console.warn('Supabase image generation failed, falling back to Azure DALL-E:', supabaseError);
-        }
-      } else {
-        console.log('Skipping Supabase function due to missing configuration, using Azure DALL-E directly');
-      }
-      
-      // If Supabase function fails, use Azure DALL-E directly
-      toast.info("Generating image with Azure DALL-E...");
-      
+      if (!AZURE_DALLE_API_KEY || !AZURE_DALLE_ENDPOINT) throw new Error("Azure DALL-E API key or endpoint is missing. Please check your environment variables.");
       try {
-        // Make API request to Azure DALL-E
         const response = await axios.post(
           AZURE_DALLE_ENDPOINT,
           {
-            prompt: enhancedPrompt,
+            prompt: imagePrompt,
             n: 1,
             size: '1024x1024',
             response_format: 'url'
@@ -230,46 +184,40 @@ export const PosterEditor: React.FC<PosterEditorProps> = ({ template, onBack }) 
             }
           }
         );
-        
-        // Extract the image URL from the response
         if (response.data && response.data.data && response.data.data.length > 0) {
           const imageUrl = response.data.data[0].url;
           setGeneratedImage(imageUrl);
           toast.success("Image generated successfully via Azure DALL-E!");
+          setIsGeneratingImage(false);
+          return;
         } else {
           throw new Error("No image was generated. Please try a different prompt.");
         }
-      } catch (dalleError) {
-        console.error('Azure DALL-E error:', dalleError);
-        throw new Error("Failed to generate image with Azure DALL-E. Please try a different prompt.");
+      } catch (azureError: any) {
+        // If Azure fails with 401/403, try Supabase function
+        if (azureError.response && (azureError.response.status === 401 || azureError.response.status === 403)) {
+          toast.info("Azure DALL-E unauthorized. Trying Supabase image generation...");
+          try {
+            const { data, error } = await supabase.functions.invoke('generate-image', {
+              body: { prompt: imagePrompt, templateStyle: template.name }
+            });
+            if (!error && data && data.imageUrl) {
+              setGeneratedImage(data.imageUrl);
+              toast.success("Image generated via Supabase!");
+              setIsGeneratingImage(false);
+              return;
+            } else {
+              throw new Error(error?.message || 'Supabase image generation failed');
+            }
+          } catch (supabaseError) {
+            toast.error("Both Azure and Supabase image generation failed. Using placeholder.");
+            setGeneratedImage('/placeholder.svg');
+          }
+        } else {
+          toast.error("Failed to generate image. Using a placeholder instead.");
+          setGeneratedImage('/placeholder.svg');
+        }
       }
-    } catch (error) {
-      console.error('Error generating image:', error);
-      toast.error("Failed to generate image. Using a placeholder instead.");
-      
-      // Fallback to a placeholder image based on the template type
-      const placeholderImages = {
-        'Business': '/placeholders/business.jpg',
-        'Event': '/placeholders/event.jpg',
-        'Sale': '/placeholders/sale.jpg',
-        'Promotion': '/placeholders/promotion.jpg',
-        'default': '/placeholder.svg'
-      };
-      
-      // Get a placeholder image that matches the template name or use default
-      const placeholderImage = placeholderImages[template.name] || placeholderImages.default;
-      
-      // Set the placeholder and inform the user
-      setGeneratedImage(placeholderImage);
-      toast.warning("Using a template image. You can try again with a different prompt.");
-      
-      // Suggest an improved prompt to the user based on their initial request
-      // This gives them actionable feedback for their next attempt
-      const improvedPrompt = 
-        `Try using a more descriptive prompt such as: "Professional ${template.name.toLowerCase()} poster ` + 
-        `with ${imagePrompt}, high quality, photorealistic, clean layout"`;
-        
-      toast.info(improvedPrompt, { duration: 8000 });
     } finally {
       setIsGeneratingImage(false);
     }
