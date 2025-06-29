@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
@@ -25,10 +24,12 @@ serve(async (req) => {
       )
     }
 
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
-    if (!GEMINI_API_KEY) {
+    // Azure OpenAI configuration
+    const AZURE_DALLE_API_KEY = Deno.env.get('AZURE_DALLE_API_KEY')
+    const AZURE_DALLE_ENDPOINT = Deno.env.get('AZURE_DALLE_ENDPOINT')
+    if (!AZURE_DALLE_API_KEY || !AZURE_DALLE_ENDPOINT) {
       return new Response(
-        JSON.stringify({ error: 'GEMINI_API_KEY not configured' }),
+        JSON.stringify({ error: 'Azure DALL-E API key or endpoint not configured' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 500 
@@ -36,40 +37,24 @@ serve(async (req) => {
       )
     }
 
-    // Using Google's Gemini API for image generation
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateImage?key=${GEMINI_API_KEY}`, {
+    // Call Azure DALL-E endpoint
+    const response = await fetch(AZURE_DALLE_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'api-key': AZURE_DALLE_API_KEY
       },
       body: JSON.stringify({
-        prompt: {
-          text: prompt
-        },
-        safetySettings: [
-          {
-            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            threshold: "BLOCK_LOW_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_HATE_SPEECH", 
-            threshold: "BLOCK_LOW_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_HARASSMENT",
-            threshold: "BLOCK_LOW_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-            threshold: "BLOCK_LOW_AND_ABOVE"
-          }
-        ]
+        prompt: prompt,
+        n: 1,
+        size: '1024x1024',
+        response_format: 'url'
       })
     })
 
     if (!response.ok) {
       const errorData = await response.text()
-      console.error('Gemini API error:', errorData)
+      console.error('Azure DALL-E API error:', errorData)
       return new Response(
         JSON.stringify({ error: 'Failed to generate image', details: errorData }),
         { 
@@ -80,14 +65,9 @@ serve(async (req) => {
     }
 
     const data = await response.json()
-    
-    if (data.generatedImages && data.generatedImages.length > 0) {
-      const imageBase64 = data.generatedImages[0].bytesBase64Encoded
+    if (data.data && data.data.length > 0 && data.data[0].url) {
       return new Response(
-        JSON.stringify({ 
-          image: `data:image/png;base64,${imageBase64}`,
-          success: true 
-        }),
+        JSON.stringify({ imageUrl: data.data[0].url, success: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     } else {
